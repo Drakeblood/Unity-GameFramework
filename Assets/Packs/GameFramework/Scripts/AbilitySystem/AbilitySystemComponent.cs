@@ -9,7 +9,8 @@ namespace GameFramework.AbilitySystem
 {
     public partial class AbilitySystemComponent : MonoBehaviour
     {
-        [SerializeField] private List<GameplayAbilityData> StartupAbilities = new List<GameplayAbilityData>();
+        [SerializeField] 
+        private List<GameplayAbilityData> StartupAbilities = new List<GameplayAbilityData>();
         protected List<GameplayAbility> ActivatableAbilities = new List<GameplayAbility>();
 
         protected Dictionary<GameplayTag, int> GameplayTagCountArray = new Dictionary<GameplayTag, int>();
@@ -51,13 +52,15 @@ namespace GameFramework.AbilitySystem
         public partial void GiveAbility(GameplayAbilityData AbilityData)
         {
             if (AbilityData == null) return;
-
+            
             ActivatableAbilities.Add(AbilityData.GetGameplayAbility());
             AbilityData.GetGameplayAbility().OnGiveAbility(this);
         }
 
         public partial bool TryActivateAbility(Type AbilityClass)
         {
+            if(AbilityClass == null) return false;
+
             foreach (var Ability in ActivatableAbilities)
             {
                 if (Ability.GetGameplayAbilityData().AbilityClass.Type == AbilityClass)

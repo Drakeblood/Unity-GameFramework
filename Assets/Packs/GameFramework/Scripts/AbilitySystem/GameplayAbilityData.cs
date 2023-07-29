@@ -14,6 +14,8 @@ namespace GameFramework.AbilitySystem
     {
         [Inherits(typeof(GameplayAbility), IncludeBaseType = true, ShowNoneElement = false)]
         public TypeReference AbilityClass = new TypeReference(typeof(GameplayAbility));
+
+        [SerializeField, HideInInspector]
         private TypeReference OldAbilityClass = new TypeReference(typeof(GameplayAbility));
 
         [SerializeReference]

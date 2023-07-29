@@ -130,8 +130,6 @@ namespace GameFramework.Editor
             if (TagList != null)
             {
                 TagList.Init();
-                //Debug.LogError($"Resources/{ProjectStatics.ProjectTagsAssetPath} file is not valid, create proper asset using Tool/GameFramework/InitProject");
-                //return;
             }
         }
 

@@ -1,5 +1,7 @@
 using System;
 
+using UnityEngine;
+
 using GameFramework.System;
 
 namespace GameFramework.AbilitySystem
@@ -7,6 +9,7 @@ namespace GameFramework.AbilitySystem
     [Serializable]
     public class GameplayAbility : object
     {
+        [SerializeField, HideInInspector]
         private GameplayAbilityData Data;
         public GameplayAbilityData GetGameplayAbilityData() => Data;
 

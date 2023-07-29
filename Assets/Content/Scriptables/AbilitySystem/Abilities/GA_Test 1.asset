@@ -17,8 +17,13 @@ MonoBehaviour:
     GUID: 9e8c5811b1a6dc94688d4a261ca49271
     _typeNameAndAssembly: GA_Test1, Assembly-CSharp
     _suppressLogs: 0
+  OldAbilityClass:
+    GuidAssignmentFailed: 0
+    GUID: 9e8c5811b1a6dc94688d4a261ca49271
+    _typeNameAndAssembly: GA_Test1, Assembly-CSharp
+    _suppressLogs: 0
   GameplayAbility:
-    rid: 3045474153047261185
+    rid: 3045474155322408961
   AbilityTags: []
   CancelAbilitiesWithTag: []
   BlockAbilitiesWithTag: []
@@ -30,7 +35,8 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: 3045474153047261185
+    - rid: 3045474155322408961
       type: {class: GA_Test1, ns: , asm: Assembly-CSharp}
       data:
-        Text: abcdef
+        Data: {fileID: 11400000}
+        Text: ABCDE
