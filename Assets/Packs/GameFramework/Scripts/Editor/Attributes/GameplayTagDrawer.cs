@@ -11,18 +11,11 @@ namespace GameFramework.Editor.Attributes
     [CustomPropertyDrawer(typeof(GameplayTagAttribute))]
     public class GameplayTagDrawer : PropertyDrawer
     {
-        GameplayTagList TagList = Resources.Load<GameplayTagList>(ProjectStatics.ProjectTagsAssetPath);
         string[] StringList = null;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (TagList == null)
-            {
-                TagList = Resources.Load<GameplayTagList>(ProjectStatics.ProjectTagsAssetPath);
-                if (TagList == null) return;
-            }
-
-            if (StringList != TagList.GetTags()) StringList = TagList.GetTags();
+            if (StringList != GameplayTags.GetTagsNames()) StringList = GameplayTags.GetTagsNames();
 
             if (StringList != null && StringList.Length != 0)
             {

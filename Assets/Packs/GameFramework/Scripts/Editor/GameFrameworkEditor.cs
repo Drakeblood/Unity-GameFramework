@@ -9,12 +9,12 @@ namespace GameFramework.Editor
 {
     public static class GameFrameworkEditor
     {
-        [MenuItem("Tools/GameFramework/InitProject", priority = 1)]
+        [MenuItem("Tools/GameFramework/Init Project", priority = 1)]
         public static void Init()
         {
             CreateGameModeSettingsAsset();
             CreateProjectSettingsAsset();
-            CreateProjectTagsAsset();
+            //CreateProjectTagsAsset();
             CreateWorldAsset();
         }
 
@@ -66,25 +66,25 @@ namespace GameFramework.Editor
             Debug.Log($"{FileName} created at Resources/GameFramework");
         }
 
-        private static void CreateProjectTagsAsset()
-        {
-            if (Resources.Load(ProjectStatics.ProjectTagsAssetPath) != null)
-            {
-                Debug.Log("ProjectTags asset is already exists");
-                return;
-            }
+        //private static void CreateProjectTagsAsset()
+        //{
+        //    if (Resources.Load(ProjectStatics.ProjectTagsAssetPath) != null)
+        //    {
+        //        Debug.Log("ProjectTags asset is already exists");
+        //        return;
+        //    }
 
-            string Path = "Assets/Resources/GameFramework";
-            CheckFolders(ref Path);
+        //    string Path = "Assets/Resources/GameFramework";
+        //    CheckFolders(ref Path);
 
-            string FileName = ProjectStatics.ProjectTagsAssetPath.Substring(ProjectStatics.ProjectTagsAssetPath.LastIndexOf('/'));
+        //    string FileName = ProjectStatics.ProjectTagsAssetPath.Substring(ProjectStatics.ProjectTagsAssetPath.LastIndexOf('/'));
 
-            var Asset = ScriptableObject.CreateInstance<GameplayTagList>();
-            AssetDatabase.CreateAsset(Asset, Path + $"/{FileName}.asset");
-            AssetDatabase.SaveAssets();
+        //    var Asset = ScriptableObject.CreateInstance<GameplayTagList>();
+        //    AssetDatabase.CreateAsset(Asset, Path + $"/{FileName}.asset");
+        //    AssetDatabase.SaveAssets();
 
-            Debug.Log($"{FileName} created at Resources/GameFramework");
-        }
+        //    Debug.Log($"{FileName} created at Resources/GameFramework");
+        //}
 
         private static void CreateWorldAsset()
         {
@@ -125,12 +125,6 @@ namespace GameFramework.Editor
         {
             EditorSceneManager.sceneOpened += OnSceneOpened;
             EditorSceneManager.newSceneCreated += OnNewSceneCreated;
-
-            GameplayTagList TagList = Resources.Load<GameplayTagList>(ProjectStatics.ProjectTagsAssetPath);
-            if (TagList != null)
-            {
-                TagList.Init();
-            }
         }
 
         private static void OnNewSceneCreated(Scene InScene, NewSceneSetup InSetup, NewSceneMode InMode)

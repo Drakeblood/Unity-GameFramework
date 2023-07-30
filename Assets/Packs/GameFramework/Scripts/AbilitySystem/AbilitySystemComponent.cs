@@ -3,6 +3,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using SolidUtilities.UnityEngineInternals;
+
 using GameFramework.System;
 
 namespace GameFramework.AbilitySystem
@@ -52,9 +54,10 @@ namespace GameFramework.AbilitySystem
         public partial void GiveAbility(GameplayAbilityData AbilityData)
         {
             if (AbilityData == null) return;
-            
-            ActivatableAbilities.Add(AbilityData.GetGameplayAbility());
-            AbilityData.GetGameplayAbility().OnGiveAbility(this);
+
+            GameplayAbility GameplayAbility = AbilityData.GetGameplayAbility().ShallowCopy();
+            ActivatableAbilities.Add(GameplayAbility);
+            GameplayAbility.OnGiveAbility(this);
         }
 
         public partial bool TryActivateAbility(Type AbilityClass)

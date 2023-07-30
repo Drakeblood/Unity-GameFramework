@@ -29,9 +29,9 @@ MonoBehaviour:
   BlockAbilitiesWithTag: []
   ActivationOwnedTags: []
   ActivationRequiredTags:
-  - TagName: Character.Movement.Sprinting
+  - TagName: Character.Movement.Walking
   ActivationBlockedTags:
-  - TagName: Character.Status.Dying
+  - TagName: Character.Status.Death
   references:
     version: 2
     RefIds:

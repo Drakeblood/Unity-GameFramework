@@ -6,10 +6,10 @@ namespace GameFramework.System
     {
         public static readonly string ProjectSettingsAssetPath = "GameFramework/ProjectSettings";
         public static readonly string GameModeSettingsAssetPath = "GameFramework/GameModeSettings";
-        public static readonly string ProjectTagsAssetPath = "GameFramework/ProjectTags";
+        public static readonly string GameplayTagsAssetPath = "Assets/Packs/GameFramework/Scripts/GameplayTags.cs";
 
         public static World World;
-
+        
         public static GameObject GetPlayer(int Index = 0)
         {
             if (World != null)

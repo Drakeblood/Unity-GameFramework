@@ -1118,11 +1118,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Tag1:
-    TagName: Character.Movement.Sprinting
+    TagName: Character.Movement.Walking
+    TagId: 2
   Tag2:
     TagName: Character.Movement.Falling
+    TagId: 3
   Tags:
-  - TagName: Character.Movement.Sprinting
+  - TagName: Character.Movement.Walking
+    TagId: 2
 --- !u!65 &1892325619
 BoxCollider:
   m_ObjectHideFlags: 0

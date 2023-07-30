@@ -6,6 +6,13 @@
       "source": "embedded",
       "dependencies": {}
     },
+    "com.silverdale.asset-reference-viewer": {
+      "version": "https://github.com/Dasparion/AssetReferenceViewer.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "623096f66e90726a2219910dd13d06f5b97054af"
+    },
     "com.solidalloy.type-references": {
       "version": "2.16.0",
       "depth": 0,

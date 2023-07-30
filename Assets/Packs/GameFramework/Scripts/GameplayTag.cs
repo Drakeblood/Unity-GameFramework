@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+
 using UnityEngine;
 
 namespace GameFramework.System
@@ -7,14 +7,16 @@ namespace GameFramework.System
     [Serializable]
     public class GameplayTag : object, ISerializationCallbackReceiver
     {
-        [SerializeField] private string TagName;
+        [SerializeField]
+        private string TagName;
         public string GetTagName() => TagName;
 
+        [SerializeField, HideInInspector]
         private int TagId = -1;
         public int GetTagId() => TagId;
 
         /// <summary>
-        /// Use RequestTag instead.
+        /// Use GameplayTags.GetTag instead.
         /// </summary>
         public GameplayTag(string InTagName, int InTagId)
         {
@@ -22,17 +24,13 @@ namespace GameFramework.System
             TagId = InTagId;
         }
 
-        public static GameplayTag RequestTag(string InTagName)
-        {
-            if(InTagName == null || InTagName == "") return null;
-            return GameplayTagsManager.GetTag(InTagName);
-        }
-
+        /// <summary>
+        /// "A.B".MatchesTag("A") = True
+        /// </summary>
         public bool MatchesTag(GameplayTag TagToCheck)
         {
-            //"A.B".MatchesTag("A") = True
-            GameplayTag[] SeparatedTag = GameplayTagsManager.GetSeparatedTag(this);
-            GameplayTag[] SeparatedTagToCheck = GameplayTagsManager.GetSeparatedTag(TagToCheck);
+            GameplayTag[] SeparatedTag = GameplayTags.GetSeparatedTag(this);
+            GameplayTag[] SeparatedTagToCheck = GameplayTags.GetSeparatedTag(TagToCheck);
 
             if (SeparatedTag.Length == SeparatedTagToCheck.Length) return this == TagToCheck;
             if (SeparatedTagToCheck.Length > SeparatedTag.Length) return false;
@@ -104,75 +102,22 @@ namespace GameFramework.System
         public void OnAfterDeserialize()
         {
             if(TagName == null || TagName == "") return;
-            
-            GameplayTag Tag = GameplayTagsManager.GetTag(TagName);
+
+            GameplayTag Tag = null;
+
+            if (TagId != -1)
+            {
+                Tag = GameplayTags.GetTag(TagId);
+                if(Tag != null)
+                {
+                    if (Tag.TagName == TagName) return;
+                }
+            }
+
+            Tag = GameplayTags.GetTag(TagName);
             if (Tag == null) return;
             
             TagId = Tag.TagId;
-        }
-    }
-
-    public static class GameplayTagsManager
-    {
-        private static GameplayTag[] Tags = new GameplayTag[0];
-        private static Tuple<GameplayTag, GameplayTag[]>[] TagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[0];
-
-        public static GameplayTag GetTag(string InTagName)
-        {
-            for (int i = 0; i < Tags.Length; i++)
-            {
-                if (Tags[i].GetTagName() == InTagName)
-                {
-                    return Tags[i];
-                }
-            }
-            return null;
-        }
-
-        public static GameplayTag[] GetTags() => Tags;
-        public static int GetTagsCount() => Tags.Length;
-
-        public static GameplayTag[] GetSeparatedTag(GameplayTag InTag)
-        {
-            for (int i = 0; i < TagsWithSubTags.Length; i++)
-            {
-                if (TagsWithSubTags[i].Item1.GetTagName() == InTag.GetTagName())
-                {
-                    return TagsWithSubTags[i].Item2;
-                }
-            }
-            return null;
-        }
-        
-        public static void Init(ref string[] InTags)
-        {
-            Tags = new GameplayTag[InTags.Length];
-            TagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[InTags.Length];
-
-            for (int i = 0; i < InTags.Length; i++)
-            {
-                List<GameplayTag> ParentTags = new List<GameplayTag>();
-                {
-                    string Tag = InTags[i];
-                    for (int Index = Tag.LastIndexOf('.'); Index != -1; Index = Tag.LastIndexOf('.'))
-                    {
-                        Tag = Tag.Substring(0, Index);
-                        ParentTags.Add(GameplayTag.RequestTag(Tag));
-                    }
-                }
-
-                GameplayTag[] ParentTagsArray = new GameplayTag[ParentTags.Count];
-                {
-                    int n = 0;
-                    for (int j = ParentTags.Count - 1; j >= 0; j--)
-                    {
-                        ParentTagsArray[n++] = ParentTags[j];
-                    }
-                }
-
-                Tags[i] = new GameplayTag(InTags[i], i);
-                TagsWithSubTags[i] = new Tuple<GameplayTag, GameplayTag[]>(Tags[i], ParentTagsArray);
-            }
         }
     }
 }

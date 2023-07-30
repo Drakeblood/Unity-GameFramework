@@ -1,0 +1,9 @@
+Character,
+Character.Movement,
+Character.Movement.Falling,
+Character.Movement.Walking,
+Character.Status,
+Character.Status.Death,
+Character.Status.Death.Dead,Applied when character is dead
+Character.Status.Death.Dying,Applied when character is dying
+Character.Status.Stunned,Applied when character is stunned
