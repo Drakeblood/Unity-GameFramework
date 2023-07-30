@@ -8,6 +8,8 @@ namespace GameFramework.System
 {
     public sealed partial class World : MonoBehaviour
     {
+        public static World Instance { get; private set; }
+
         private static GameInstance GameInstance;
 
         private partial void Awake();
@@ -36,7 +38,14 @@ namespace GameFramework.System
     {
         private partial void Awake()
         {
-            ProjectStatics.World = this;
+            if (Instance != null && Instance != this)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                Instance = this;
+            }
 
             ProjectSettings Settings = Resources.Load<ProjectSettings>(ProjectStatics.ProjectSettingsAssetPath);
             if (Settings == null)

@@ -101,7 +101,7 @@ public class GameplayTagsWindow : EditorWindow
         newTagDescriptionVis.style.minHeight = 20f;
         root.Add(newTagDescriptionVis);
 
-        Label newTagDescriptionLabel = new Label("Tag Description:");
+        Label newTagDescriptionLabel = new Label("Tag description:");
         newTagDescriptionVis.Add(newTagDescriptionLabel);
 
         TextField newTagDescription = new TextField();
@@ -114,6 +114,13 @@ public class GameplayTagsWindow : EditorWindow
         button.style.flexBasis = 17f;
         button.style.minHeight = 17f;
         root.Add(button);
+
+        Button discardButton = new Button();
+        discardButton.text = "Discard changes";
+        discardButton.clicked += () => { OnEnable(); FillScrollViev(); };
+        discardButton.style.flexBasis = 17f;
+        discardButton.style.minHeight = 17f;
+        root.Add(discardButton);
 
         scrollView = new ScrollView(ScrollViewMode.Vertical);
         root.Add(scrollView);

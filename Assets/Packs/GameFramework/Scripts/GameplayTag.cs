@@ -103,8 +103,7 @@ namespace GameFramework.System
         {
             if(TagName == null || TagName == "") return;
 
-            GameplayTag Tag = null;
-
+            GameplayTag Tag = null;            
             if (TagId != -1)
             {
                 Tag = GameplayTags.GetTag(TagId);
@@ -113,7 +112,7 @@ namespace GameFramework.System
                     if (Tag.TagName == TagName) return;
                 }
             }
-
+            
             Tag = GameplayTags.GetTag(TagName);
             if (Tag == null) return;
             

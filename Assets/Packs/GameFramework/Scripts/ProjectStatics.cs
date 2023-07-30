@@ -7,16 +7,14 @@ namespace GameFramework.System
         public static readonly string ProjectSettingsAssetPath = "GameFramework/ProjectSettings";
         public static readonly string GameModeSettingsAssetPath = "GameFramework/GameModeSettings";
         public static readonly string GameplayTagsAssetPath = "Assets/Packs/GameFramework/Scripts/GameplayTags.cs";
-
-        public static World World;
         
         public static GameObject GetPlayer(int Index = 0)
         {
-            if (World != null)
+            if (World.Instance != null)
             {
-                if (World.PlayerArray.Count > Index)
+                if (World.Instance.PlayerArray.Count > Index)
                 {
-                    return World.PlayerArray[Index];
+                    return World.Instance.PlayerArray[Index];
                 }
             }
             return null;

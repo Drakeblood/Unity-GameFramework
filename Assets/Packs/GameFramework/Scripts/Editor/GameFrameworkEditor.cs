@@ -14,7 +14,6 @@ namespace GameFramework.Editor
         {
             CreateGameModeSettingsAsset();
             CreateProjectSettingsAsset();
-            //CreateProjectTagsAsset();
             CreateWorldAsset();
         }
 
@@ -66,26 +65,6 @@ namespace GameFramework.Editor
             Debug.Log($"{FileName} created at Resources/GameFramework");
         }
 
-        //private static void CreateProjectTagsAsset()
-        //{
-        //    if (Resources.Load(ProjectStatics.ProjectTagsAssetPath) != null)
-        //    {
-        //        Debug.Log("ProjectTags asset is already exists");
-        //        return;
-        //    }
-
-        //    string Path = "Assets/Resources/GameFramework";
-        //    CheckFolders(ref Path);
-
-        //    string FileName = ProjectStatics.ProjectTagsAssetPath.Substring(ProjectStatics.ProjectTagsAssetPath.LastIndexOf('/'));
-
-        //    var Asset = ScriptableObject.CreateInstance<GameplayTagList>();
-        //    AssetDatabase.CreateAsset(Asset, Path + $"/{FileName}.asset");
-        //    AssetDatabase.SaveAssets();
-
-        //    Debug.Log($"{FileName} created at Resources/GameFramework");
-        //}
-
         private static void CreateWorldAsset()
         {
             if (AssetDatabase.LoadAssetAtPath<GameObject>("Packs/GameFramework/World") != null)
@@ -121,7 +100,7 @@ namespace GameFramework.Editor
         }
 
         [InitializeOnLoadMethod]
-        private static void InitializeDNEditor()
+        private static void InitializeEditor()
         {
             EditorSceneManager.sceneOpened += OnSceneOpened;
             EditorSceneManager.newSceneCreated += OnNewSceneCreated;
