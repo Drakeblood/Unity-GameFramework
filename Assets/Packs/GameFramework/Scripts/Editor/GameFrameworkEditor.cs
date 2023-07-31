@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 
 using GameFramework.System;
+using System;
+using System.IO;
 
 namespace GameFramework.Editor
 {
@@ -14,6 +16,7 @@ namespace GameFramework.Editor
         {
             CreateGameModeSettingsAsset();
             CreateProjectSettingsAsset();
+            CreateGameplayTagsAsset();
             CreateWorldAsset();
         }
 
@@ -41,6 +44,7 @@ namespace GameFramework.Editor
             }
             
             AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
 
             Debug.Log($"{FileName} created at Resources/GameFramework");
         }
@@ -61,13 +65,29 @@ namespace GameFramework.Editor
             var Asset = ScriptableObject.CreateInstance<GameModeSettings>();
             AssetDatabase.CreateAsset(Asset, Path + $"/{FileName}.asset");
             AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
 
             Debug.Log($"{FileName} created at Resources/GameFramework");
         }
 
+        private static void CreateGameplayTagsAsset()
+        {
+            if (Resources.Load(ProjectStatics.GameplayTagsAssetPath) != null)
+            {
+                Debug.Log("GameplayTags asset is already exists");
+                return;
+            }
+
+            File.WriteAllText("Assets/Resources/" + ProjectStatics.GameplayTagsAssetPath + ".txt", "");
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log("GameplayTagsAsset created at Resources/GameFramework");
+        }
+
         private static void CreateWorldAsset()
         {
-            if (AssetDatabase.LoadAssetAtPath<GameObject>("Packs/GameFramework/World") != null)
+            if (AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Packs/GameFramework/World.prefab") != null)
             {
                 Debug.Log("World prefab is already exists");
                 return;

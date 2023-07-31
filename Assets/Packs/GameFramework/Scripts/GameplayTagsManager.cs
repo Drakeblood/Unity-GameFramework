@@ -1,34 +1,47 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace GameFramework.System
 {
-    public static class GameplayTags
+    public static class GameplayTagsManager
     {
-        private static string[] TagsNames =
-{
-"Character,",
-"Character.Movement,",
-"Character.Movement.Falling,",
-"Character.Movement.Walking,",
-"Character.Status,",
-"Character.Status.Death,",
-"Character.Status.Death.Dead,Applied when character is dead",
-"Character.Status.Death.Dying,Applied when character is started dying",
-"Character.Status.Stunned,Applied when character is stunned",
-};
+        private static string[] TagsNames;
         public static string[] GetTagsNames() => TagsNames;
 
         private static GameplayTag[] Tags = new GameplayTag[0];
         private static Tuple<GameplayTag, GameplayTag[]>[] TagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[0];
 
-        static GameplayTags()
+#if UNITY_EDITOR
+        static GameplayTagsManager()
         {
-            for(int i = 0; i < TagsNames.Length; i++)
+            TagsNames = File.ReadAllLines("Assets/Resources/" + ProjectStatics.GameplayTagsAssetPath + ".txt");
+
+            for (int i = 0; i < TagsNames.Length; i++)
             {
                 TagsNames[i] = TagsNames[i].Split(',')[0];
             }
+            InitializeTags();
+        }
+#else
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void LoadAsset()
+        {
+            UnityEngine.TextAsset TagsAsset = UnityEngine.Resources.Load<UnityEngine.TextAsset>(ProjectStatics.GameplayTagsAssetPath);
+            if (TagsAsset == null) return;
 
+            TagsNames = TagsAsset.text.Split('\n');
+
+            for (int i = 0; i < TagsNames.Length; i++)
+            {
+                TagsNames[i] = TagsNames[i].Split(',')[0];
+            }
+            InitializeTags();
+        }
+#endif
+
+        private static void InitializeTags()
+        {
             Tags = new GameplayTag[TagsNames.Length];
             TagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[TagsNames.Length];
 

@@ -1,10 +1,10 @@
+using System;
+
 using UnityEngine;
 using UnityEditor;
 
 using GameFramework.System.Attributes;
 using GameFramework.System;
-
-using System;
 
 namespace GameFramework.Editor.Attributes
 {
@@ -15,7 +15,7 @@ namespace GameFramework.Editor.Attributes
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (StringList != GameplayTags.GetTagsNames()) StringList = GameplayTags.GetTagsNames();
+            if (StringList != GameplayTagsManager.GetTagsNames()) StringList = GameplayTagsManager.GetTagsNames();
 
             if (StringList != null && StringList.Length != 0)
             {

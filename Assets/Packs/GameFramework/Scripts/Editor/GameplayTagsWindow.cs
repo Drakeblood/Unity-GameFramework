@@ -1,12 +1,14 @@
-using GameFramework.System;
-using SolidUtilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using UnityEditor;
-using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.UIElements;
+
+using SolidUtilities;
+
+using GameFramework.System;
 
 public class GameplayTagsWindow : EditorWindow
 {
@@ -28,39 +30,11 @@ public class GameplayTagsWindow : EditorWindow
     {
         wasChanged = false;
 
-        string[] tagsScript = File.ReadAllLines(ProjectStatics.GameplayTagsAssetPath);
-
-        int openIndex = -1;
-        int closeIndex = -1;
-        for (int i = 0; i < tagsScript.Length; i++)
-        {
-            if (tagsScript[i].Contains("private static string[] TagsNames ="))
-            {
-                openIndex = i + 1;
-                break;
-            }
-        }
-
-        for (int i = openIndex + 1; i < tagsScript.Length; i++)
-        {
-            if (tagsScript[i].Contains("}"))
-            {
-                closeIndex = i;
-                break;
-            }
-        }
-
-        if (openIndex == -1 || closeIndex == -1) return;
-
-        string[] tagsInFile = new string[closeIndex - openIndex - 1];
-        Array.Copy(tagsScript, openIndex + 1, tagsInFile, 0, (closeIndex - openIndex) - 1);
-
+        string[] tagsInFile = File.ReadAllLines("Assets/Resources/" + ProjectStatics.GameplayTagsAssetPath + ".txt");
         tags.Clear();
+
         for (int i = 0; i < tagsInFile.Length; i++)
         {
-            if (tagsInFile[i] == "") continue;
-
-            tagsInFile[i] = tagsInFile[i].Substring(1, tagsInFile[i].Length - 3);
             string[] TagAndDescription = tagsInFile[i].Split(',');
             tags.Add(new(TagAndDescription[0], TagAndDescription.Length > 1 ? TagAndDescription[1] : ""));
         }
@@ -320,42 +294,7 @@ public class GameplayTagsWindow : EditorWindow
             tagsToWrite[i] = tags[i].Item1 + "," + tags[i].Item2;
         }
 
-        string[] tagsScript = File.ReadAllLines(ProjectStatics.GameplayTagsAssetPath);
-
-        int openIndex = -1;
-        int closeIndex = -1;
-        for(int i = 0; i < tagsScript.Length; i++)
-        {
-            if (tagsScript[i].Contains("private static string[] TagsNames ="))
-            {
-                openIndex = i + 1;
-                break;
-            }
-        }
-
-        for (int i = openIndex + 1; i < tagsScript.Length; i++)
-        {
-            if (tagsScript[i].Contains("}"))
-            {
-                closeIndex = i;
-                break;
-            }
-        }
-
-        if (openIndex == -1 || closeIndex == -1) return;
-
-        for(int i = 0; i < tagsToWrite.Length; i++)
-        {
-            tagsToWrite[i] = "\"" + tagsToWrite[i] + "\",";
-        }
-
-        string[] finalFile = new string[tagsScript.Length - (closeIndex - openIndex) + tagsToWrite.Length + 1];
-
-        Array.Copy(tagsScript, finalFile, openIndex + 1);
-        Array.Copy(tagsToWrite, 0, finalFile, openIndex + 1, tagsToWrite.Length);
-        Array.Copy(tagsScript, closeIndex, finalFile, openIndex + tagsToWrite.Length + 1, tagsScript.Length - closeIndex);
-
-        File.WriteAllLines(ProjectStatics.GameplayTagsAssetPath, finalFile);
-        CompilationPipeline.RequestScriptCompilation();
+        File.WriteAllLines("Assets/Resources/" + ProjectStatics.GameplayTagsAssetPath + ".txt", tagsToWrite);
+        AssetDatabase.Refresh();
     }
 }

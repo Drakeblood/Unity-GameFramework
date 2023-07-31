@@ -29,8 +29,8 @@ namespace GameFramework.System
         /// </summary>
         public bool MatchesTag(GameplayTag TagToCheck)
         {
-            GameplayTag[] SeparatedTag = GameplayTags.GetSeparatedTag(this);
-            GameplayTag[] SeparatedTagToCheck = GameplayTags.GetSeparatedTag(TagToCheck);
+            GameplayTag[] SeparatedTag = GameplayTagsManager.GetSeparatedTag(this);
+            GameplayTag[] SeparatedTagToCheck = GameplayTagsManager.GetSeparatedTag(TagToCheck);
 
             if (SeparatedTag.Length == SeparatedTagToCheck.Length) return this == TagToCheck;
             if (SeparatedTagToCheck.Length > SeparatedTag.Length) return false;
@@ -102,18 +102,18 @@ namespace GameFramework.System
         public void OnAfterDeserialize()
         {
             if(TagName == null || TagName == "") return;
-
+            
             GameplayTag Tag = null;            
             if (TagId != -1)
             {
-                Tag = GameplayTags.GetTag(TagId);
+                Tag = GameplayTagsManager.GetTag(TagId);
                 if(Tag != null)
                 {
                     if (Tag.TagName == TagName) return;
                 }
             }
             
-            Tag = GameplayTags.GetTag(TagName);
+            Tag = GameplayTagsManager.GetTag(TagName);
             if (Tag == null) return;
             
             TagId = Tag.TagId;
