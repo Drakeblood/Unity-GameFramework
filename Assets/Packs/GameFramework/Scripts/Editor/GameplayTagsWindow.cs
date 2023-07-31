@@ -112,6 +112,8 @@ public class GameplayTagsWindow : EditorWindow
             vis.style.flexDirection = FlexDirection.Row;
             vis.style.alignItems = Align.Center;
             vis.style.justifyContent = Justify.SpaceBetween;
+            vis.style.borderBottomWidth = 0.1f;
+            vis.style.borderBottomColor = Color.gray;
             scrollView.Add(vis);
 
             int lastIndexOf = tag.Item1.LastIndexOf('.');
