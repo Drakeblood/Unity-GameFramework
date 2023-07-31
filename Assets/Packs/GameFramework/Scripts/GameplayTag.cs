@@ -102,8 +102,8 @@ namespace GameFramework.System
         public void OnAfterDeserialize()
         {
             if(TagName == null || TagName == "") return;
-            
-            GameplayTag Tag = null;            
+
+            GameplayTag Tag;           
             if (TagId != -1)
             {
                 Tag = GameplayTagsManager.GetTag(TagId);
