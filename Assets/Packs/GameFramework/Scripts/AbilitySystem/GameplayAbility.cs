@@ -31,12 +31,9 @@ namespace GameFramework.AbilitySystem
     {
         public partial void StartCoroutine(IEnumerator Routine)
         {
-            if(OwningAbilitySystemComponent == null)
-            {
-                Debug.LogError(ToString() + ".StartCoroutine failed - OwningAbilitySystemComponent is not valid");
-                return;
-            }
-            OwningAbilitySystemComponent?.StartCoroutine(Routine);
+            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return; }
+
+            OwningAbilitySystemComponent.StartCoroutine(Routine);
         }
 
         public virtual partial void OnGiveAbility(AbilitySystemComponent InAbilitySystemComponent)
@@ -47,11 +44,7 @@ namespace GameFramework.AbilitySystem
         public virtual partial bool CanActivateAbility()
         {
             if (IsActive) return false;
-            if (OwningAbilitySystemComponent == null)
-            {
-                Debug.LogError(ToString() + ".CanActivateAbility failed - OwningAbilitySystemComponent is not valid");
-                return false;
-            }
+            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return false; }
 
             if (AbilityData.ActivationBlockedTags.Length > 0 || AbilityData.ActivationRequiredTags.Length > 0)
             {
@@ -66,9 +59,9 @@ namespace GameFramework.AbilitySystem
 
         public virtual partial void ActivateAbility()
         {
-            IsActive = true;
+            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return; }
 
-            if (OwningAbilitySystemComponent == null) return;
+            IsActive = true;
 
             foreach (GameplayTag Tag in AbilityData.ActivationOwnedTags)
             {
@@ -78,9 +71,9 @@ namespace GameFramework.AbilitySystem
 
         public virtual partial void EndAbility(bool WasCanceled)
         {
-            IsActive = false;
+            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return; }
 
-            if (OwningAbilitySystemComponent == null) return;
+            IsActive = false;
 
             foreach (GameplayTag Tag in AbilityData.ActivationOwnedTags)
             {

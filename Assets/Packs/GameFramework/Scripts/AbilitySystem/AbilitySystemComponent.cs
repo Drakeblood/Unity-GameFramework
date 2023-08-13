@@ -53,7 +53,7 @@ namespace GameFramework.AbilitySystem
 
         public partial void GiveAbility(GameplayAbilityData AbilityData)
         {
-            if (AbilityData == null) return;
+            if (AbilityData == null) { Debug.LogError("AbilityData is not vaild"); return; }
 
             GameplayAbility GameplayAbility = AbilityData.GetGameplayAbility().ShallowCopy();
             ActivatableAbilities.Add(GameplayAbility);
@@ -62,7 +62,7 @@ namespace GameFramework.AbilitySystem
 
         public partial bool TryActivateAbility(Type AbilityClass)
         {
-            if(AbilityClass == null) return false;
+            if (AbilityClass == null) { Debug.LogError("AbilityClass is not valid"); return false; }
 
             foreach (var Ability in ActivatableAbilities)
             {

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace GameFramework.System
 {
@@ -15,14 +16,9 @@ namespace GameFramework.System
 
         public virtual void CreatePlayer(List<GameObject> PlayerStarts)
         {
-            if (World.Instance == null) return;
-            
-            if (GameModeSettings.PlayerPrefab == null) return;
-            if (PlayerStarts.Count == 0)
-            {
-                Debug.LogError("Add player start to scene.");
-                return;
-            }
+            Assert.IsNotNull(World.Instance);
+            if(GameModeSettings.PlayerPrefab == null) { Debug.LogError("PlayerPrefab is not valid. Set it in GameModeSettings"); return; }
+            if (PlayerStarts.Count == 0) { Debug.LogError("Add player start to scene."); return; }
             
             int Index = PlayerStarts.Count < World.Instance.PlayerArray.Count ? World.Instance.PlayerArray.Count : 0;
 
