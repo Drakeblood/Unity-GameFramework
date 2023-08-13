@@ -1,13 +1,11 @@
-using System.Timers;
-
 using UnityEngine;
 
 using GameFramework.AbilitySystem;
+using System.Collections;
 
 public class GA_Test : GameplayAbility
 {
     public GameObject G1;
-    private Timer T1 = new Timer();
 
     private Renderer Renderer;
 
@@ -15,19 +13,13 @@ public class GA_Test : GameplayAbility
     {
         base.ActivateAbility();
 
-        Debug.Log("GA_Test activated");
-
-        Renderer = Object.FindObjectOfType<Test>().GetComponent<Renderer>();
-
-        T1.Interval = 2000;
-        T1.Enabled = true;
-        T1.Elapsed += GA;
-
         if (G1 != null)
         {
-            Debug.Log(G1.name);
+            Renderer = Object.FindObjectOfType<Test>().GetComponent<Renderer>();
             Renderer.material.color = Color.blue;
         }
+
+        StartCoroutine(Finish());
     }
 
     public override void EndAbility(bool WasCanceled)
@@ -35,11 +27,13 @@ public class GA_Test : GameplayAbility
         base.EndAbility(WasCanceled);
     }
 
-    public void GA(object sender, ElapsedEventArgs e)
+    public IEnumerator Finish()
     {
-        T1.Enabled = false;
-        T1.Stop();
+        yield return new WaitForSeconds(2f);
 
+        Renderer.material.color = Color.black;
+        Debug.Log("GA_Test1 ended: " + G1.name);
+        
         EndAbility(false);
     }
 }

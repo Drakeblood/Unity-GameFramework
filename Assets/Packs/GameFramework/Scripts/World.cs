@@ -9,8 +9,7 @@ namespace GameFramework.System
     public sealed partial class World : MonoBehaviour
     {
         public static World Instance { get; private set; }
-
-        private static GameInstance GameInstance;
+        public static GameInstance GameInstance { get; private set; }
 
         private partial void Awake();
 

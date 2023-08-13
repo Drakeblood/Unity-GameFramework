@@ -23,21 +23,23 @@ MonoBehaviour:
     _typeNameAndAssembly: GA_Test, Assembly-CSharp
     _suppressLogs: 0
   GameplayAbility:
-    rid: 3045474155322408963
+    rid: 7154951281770233859
   AbilityTags: []
   CancelAbilitiesWithTag: []
   BlockAbilitiesWithTag: []
   ActivationOwnedTags: []
   ActivationRequiredTags:
   - TagName: Character.Movement.Walking
+    TagId: 3
   ActivationBlockedTags:
   - TagName: Character.Status.Death
+    TagId: 5
   references:
     version: 2
     RefIds:
-    - rid: 3045474155322408963
+    - rid: 7154951281770233859
       type: {class: GA_Test, ns: , asm: Assembly-CSharp}
       data:
-        Data: {fileID: 11400000}
+        AbilityData: {fileID: 11400000}
         G1: {fileID: 4416926081852918481, guid: b18c4076c987af548872fd13ca22d342,
           type: 3}

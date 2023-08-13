@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 
 using UnityEngine;
 
@@ -7,63 +8,86 @@ using GameFramework.System;
 namespace GameFramework.AbilitySystem
 {
     [Serializable]
-    public class GameplayAbility : object
+    public partial class GameplayAbility : object
     {
         [SerializeField, HideInInspector]
-        private GameplayAbilityData Data;
-        public GameplayAbilityData GetGameplayAbilityData() => Data;
-
-        private AbilitySystemComponent OwningAbilitySystemComponent;
+        public GameplayAbilityData AbilityData;
+        public AbilitySystemComponent OwningAbilitySystemComponent { get; private set; }
 
         private bool IsActive = false;
 
-        public virtual void OnGiveAbility(AbilitySystemComponent InAbilitySystemComponent)
+        public delegate void AbilityEnded(bool WasCanceled);
+        public event AbilityEnded OnAbilityEnded;
+
+        public partial void StartCoroutine(IEnumerator Routine);
+
+        public virtual partial void OnGiveAbility(AbilitySystemComponent InAbilitySystemComponent);
+        public virtual partial bool CanActivateAbility();
+        public virtual partial void ActivateAbility();
+        public virtual partial void EndAbility(bool WasCanceled);
+    }
+
+    public partial class GameplayAbility : object
+    {
+        public partial void StartCoroutine(IEnumerator Routine)
+        {
+            if(OwningAbilitySystemComponent == null)
+            {
+                Debug.LogError(ToString() + ".StartCoroutine failed - OwningAbilitySystemComponent is not valid");
+                return;
+            }
+            OwningAbilitySystemComponent?.StartCoroutine(Routine);
+        }
+
+        public virtual partial void OnGiveAbility(AbilitySystemComponent InAbilitySystemComponent)
         {
             OwningAbilitySystemComponent = InAbilitySystemComponent;
         }
 
-        public void SetAbilityData(GameplayAbilityData InData)
-        {
-            Data = InData;
-        }
-
-        public virtual bool CanActivateAbility()
+        public virtual partial bool CanActivateAbility()
         {
             if (IsActive) return false;
+            if (OwningAbilitySystemComponent == null)
+            {
+                Debug.LogError(ToString() + ".CanActivateAbility failed - OwningAbilitySystemComponent is not valid");
+                return false;
+            }
 
-            if (Data.ActivationBlockedTags.Length > 0 || Data.ActivationRequiredTags.Length > 0)
+            if (AbilityData.ActivationBlockedTags.Length > 0 || AbilityData.ActivationRequiredTags.Length > 0)
             {
                 GameplayTag[] AbilitySystemComponentTags = OwningAbilitySystemComponent.GetExplicitGameplayTags();
 
-                if (GameplayTag.HasAny(AbilitySystemComponentTags, Data.ActivationBlockedTags)) return false;
-                if (!GameplayTag.HasAll(AbilitySystemComponentTags, Data.ActivationRequiredTags)) return false;
+                if (GameplayTag.HasAny(AbilitySystemComponentTags, AbilityData.ActivationBlockedTags)) return false;
+                if (!GameplayTag.HasAll(AbilitySystemComponentTags, AbilityData.ActivationRequiredTags)) return false;
             }
 
             return true;
         }
 
-        public virtual void ActivateAbility()
+        public virtual partial void ActivateAbility()
         {
             IsActive = true;
 
-            if (!OwningAbilitySystemComponent) return;
+            if (OwningAbilitySystemComponent == null) return;
 
-            foreach(GameplayTag Tag in Data.ActivationOwnedTags)
+            foreach (GameplayTag Tag in AbilityData.ActivationOwnedTags)
             {
                 OwningAbilitySystemComponent.UpdateTags(Tag, 1);
             }
         }
 
-        public virtual void EndAbility(bool WasCanceled)
+        public virtual partial void EndAbility(bool WasCanceled)
         {
             IsActive = false;
 
-            if (!OwningAbilitySystemComponent) return;
+            if (OwningAbilitySystemComponent == null) return;
 
-            foreach (GameplayTag Tag in Data.ActivationOwnedTags)
+            foreach (GameplayTag Tag in AbilityData.ActivationOwnedTags)
             {
                 OwningAbilitySystemComponent.UpdateTags(Tag, -1);
             }
+
+            OnAbilityEnded?.Invoke(WasCanceled);
         }
     }
 }

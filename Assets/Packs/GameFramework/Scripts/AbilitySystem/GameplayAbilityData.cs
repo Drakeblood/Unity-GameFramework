@@ -27,7 +27,7 @@ namespace GameFramework.AbilitySystem
             if(AbilityClass.Type != OldAbilityClass.Type)
             {
                 GameplayAbility = (GameplayAbility)Activator.CreateInstance(AbilityClass);
-                GameplayAbility.SetAbilityData(this);
+                GameplayAbility.AbilityData = this;
 
                 OldAbilityClass.Type = AbilityClass.Type;
             }

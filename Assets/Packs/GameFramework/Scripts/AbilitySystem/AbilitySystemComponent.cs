@@ -66,7 +66,13 @@ namespace GameFramework.AbilitySystem
 
             foreach (var Ability in ActivatableAbilities)
             {
-                if (Ability.GetGameplayAbilityData().AbilityClass.Type == AbilityClass)
+                if(Ability.AbilityData == null)
+                {
+                    Debug.LogError("AbilityData is not valid. " + Ability.ToString());
+                    continue;
+                }
+
+                if (Ability.AbilityData.AbilityClass.Type == AbilityClass)
                 {
                     if (!Ability.CanActivateAbility()) return false;
 
