@@ -9,19 +9,20 @@ namespace GameFramework.System
     public sealed partial class World : MonoBehaviour
     {
         public static World Instance { get; private set; }
-        public static GameInstance GameInstance { get; private set; }
+
+        private static GameInstance GameInstance;
+        public T GetGameInstance<T>() where T : GameMode => GameInstance as T;
 
         private partial void Awake();
 
         #region GameMode
 
         [SerializeField] private GameModeSettings GameModeSettingsOverride;
+
         private GameMode GameMode;
+        public T GetGameMode<T>() where T : GameMode => GameMode as T;
 
         private partial void InitGameMode(GameModeSettings GameModeSettings);
-
-        public GameMode GetGameMode() => GameMode;
-        public T GetGameMode<T>() where T : GameMode => GetGameMode() as T;
 
         #endregion
 
