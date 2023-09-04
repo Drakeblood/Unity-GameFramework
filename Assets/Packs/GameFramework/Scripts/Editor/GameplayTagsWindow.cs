@@ -12,7 +12,7 @@ using GameFramework.System;
 
 public class GameplayTagsWindow : EditorWindow
 {
-    static List<ValueTuple<string, string>> tags = new List<ValueTuple<string, string>>();
+    static readonly List<ValueTuple<string, string>> tags = new();
     bool wasChanged = false;
 
     ScrollView scrollView;
@@ -22,7 +22,7 @@ public class GameplayTagsWindow : EditorWindow
     static void Init()
     {
         var window = CreateInstance<GameplayTagsWindow>();
-        window.titleContent = new GUIContent("Gameplay Tags");
+        window.titleContent = new("Gameplay Tags");
         window.Show();
     }
 
@@ -54,42 +54,42 @@ public class GameplayTagsWindow : EditorWindow
     {
         VisualElement root = rootVisualElement;
 
-        VisualElement newTagVis = new VisualElement();
+        VisualElement newTagVis = new();
         newTagVis.style.flexDirection = FlexDirection.Row;
         newTagVis.style.alignItems = Align.Center;
         newTagVis.style.flexBasis = 20f;
         newTagVis.style.minHeight = 20f;
         root.Add(newTagVis);
 
-        Label newTagTextLabel = new Label("Tag name:");
+        Label newTagTextLabel = new("Tag name:");
         newTagVis.Add(newTagTextLabel);
 
-        newTagText = new TextField();
+        newTagText = new();
         newTagText.style.flexGrow = 1;
         newTagVis.Add(newTagText);
 
-        VisualElement newTagDescriptionVis = new VisualElement();
+        VisualElement newTagDescriptionVis = new();
         newTagDescriptionVis.style.flexDirection = FlexDirection.Row;
         newTagDescriptionVis.style.alignItems = Align.Center;
         newTagDescriptionVis.style.flexBasis = 20f;
         newTagDescriptionVis.style.minHeight = 20f;
         root.Add(newTagDescriptionVis);
 
-        Label newTagDescriptionLabel = new Label("Tag description:");
+        Label newTagDescriptionLabel = new("Tag description:");
         newTagDescriptionVis.Add(newTagDescriptionLabel);
 
-        TextField newTagDescription = new TextField();
+        TextField newTagDescription = new();
         newTagDescription.style.flexGrow = 1;
         newTagDescriptionVis.Add(newTagDescription);
 
-        Button button = new Button();
+        Button button = new();
         button.text = "Add new tag";
         button.clicked += () => AddTag(newTagText.text, newTagDescription.text);
         button.style.flexBasis = 17f;
         button.style.minHeight = 17f;
         root.Add(button);
 
-        Button discardButton = new Button();
+        Button discardButton = new();
         discardButton.text = "Discard changes";
         discardButton.clicked += () => { OnEnable(); FillScrollViev(); };
         discardButton.style.flexBasis = 17f;
@@ -108,7 +108,7 @@ public class GameplayTagsWindow : EditorWindow
 
         foreach (var tag in tags)
         {
-            VisualElement vis = new VisualElement();
+            VisualElement vis = new();
             vis.style.flexDirection = FlexDirection.Row;
             vis.style.alignItems = Align.Center;
             vis.style.justifyContent = Justify.SpaceBetween;
@@ -126,23 +126,23 @@ public class GameplayTagsWindow : EditorWindow
             //}
             string labelText = lastIndexOf != -1 ? tag.Item1.Substring(lastIndexOf + 1, tag.Item1.Length - 1 - lastIndexOf) : tag.Item1;
 
-            Label label = new Label(labelText);
+            Label label = new(labelText);
             label.style.left = charCount * 17f;
             label.tooltip = tag.Item2;
             vis.Add(label);
 
-            VisualElement btns = new VisualElement();
+            VisualElement btns = new();
             btns.style.flexDirection = FlexDirection.Row;
             vis.Add(btns);
 
-            Button aBtn = new Button();
+            Button aBtn = new();
             aBtn.text = "+";
             aBtn.style.flexBasis = StyleKeyword.Auto;
             aBtn.style.height = 12;
             aBtn.clicked += () => { newTagText.value = tag.Item1 + "."; newTagText.Focus(); };
             btns.Add(aBtn);
 
-            Button rBtn = new Button();
+            Button rBtn = new();
             rBtn.text = "-";
             rBtn.style.flexBasis = StyleKeyword.Auto;
             rBtn.style.height = 12;
@@ -184,7 +184,7 @@ public class GameplayTagsWindow : EditorWindow
             }
         }
 
-        string parentTagName = tagName.LastIndexOf('.') != -1 ? tagName.Substring(0, tagName.LastIndexOf('.')) : tagName;
+        string parentTagName = tagName.LastIndexOf('.') != -1 ? tagName[..tagName.LastIndexOf('.')] : tagName;
         int entryCharCount = parentTagName.CountChars('.');
 
         for (int i = 0; i < tags.Count; i++)
@@ -241,8 +241,10 @@ public class GameplayTagsWindow : EditorWindow
 
         if( removeIndex == -1) { return; }
 
-        List<string> tagsToRemove = new List<string>();
-        tagsToRemove.Add(tagName);
+        List<string> tagsToRemove = new()
+        {
+            tagName
+        };
 
         string[] entrySubTagNames = tagName.Split('.');
 

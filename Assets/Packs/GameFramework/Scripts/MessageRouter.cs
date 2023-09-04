@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using UnityEngine;
@@ -8,7 +9,7 @@ namespace GameFramework.System
 {
     public static class MessageRouter
     {
-        static Dictionary<string, MessageDelegate> Listeners = new Dictionary<string, MessageDelegate>();
+        private static readonly Dictionary<string, MessageDelegate> Listeners = new();
         public delegate void MessageDelegate(string InChannel, object Data);
 
         public static ListenerHandle RegisterListener(string InChannel, MessageDelegate InDelegate)
@@ -35,13 +36,17 @@ namespace GameFramework.System
             if (Listeners[InChannel] == null) return;
 
             List<MessageDelegate> InvalidListenerHandles = null;
-            foreach(MessageDelegate Delegate in Listeners[InChannel].GetInvocationList())
+            Delegate[] Delegates = Listeners[InChannel].GetInvocationList();
+
+            for (int i = 0; i < Delegates.Length; i++)
             {
-                if (Delegate.Target is MonoBehaviour)
+                if (Delegates[i] is not MessageDelegate Delegate) continue;
+
+                if (Delegate.Target is MonoBehaviour Behaviour)
                 {
-                    if ((MonoBehaviour)Delegate.Target == null)
+                    if (Behaviour == null)
                     {
-                        if (InvalidListenerHandles == null) InvalidListenerHandles = new List<MessageDelegate>();
+                        InvalidListenerHandles ??= new List<MessageDelegate>();
                         InvalidListenerHandles.Add(Delegate);
                         continue;
                     }
@@ -51,9 +56,10 @@ namespace GameFramework.System
             }
 
             if (InvalidListenerHandles == null) return;
-            foreach (MessageDelegate InvalidListenerHandle in InvalidListenerHandles)
+
+            for (int i = 0; i < InvalidListenerHandles.Count; i++)
             {
-                Listeners[InChannel] -= InvalidListenerHandle;
+                Listeners[InChannel] -= InvalidListenerHandles[i];
             }
         }
     }

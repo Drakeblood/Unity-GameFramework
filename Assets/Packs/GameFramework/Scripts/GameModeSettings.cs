@@ -8,7 +8,7 @@ namespace GameFramework.System
     public class GameModeSettings : ScriptableObject
     {
         [Inherits(typeof(GameMode), IncludeBaseType = true, ShowNoneElement = false)]
-        public TypeReference GameModeClass = new TypeReference(typeof(GameMode));
+        public TypeReference GameModeClass = new(typeof(GameMode));
 
         public GameObject PlayerPrefab;
     }

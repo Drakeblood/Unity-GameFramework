@@ -17,7 +17,7 @@ namespace GameFramework.System
         public virtual void CreatePlayer(List<GameObject> PlayerStarts)
         {
             Assert.IsNotNull(World.Instance);
-            if(GameModeSettings.PlayerPrefab == null) { Debug.LogError("PlayerPrefab is not valid. Set it in GameModeSettings"); return; }
+            if (GameModeSettings.PlayerPrefab == null) { Debug.LogError("PlayerPrefab is not valid. Set it in GameModeSettings"); return; }
             if (PlayerStarts.Count == 0) { Debug.LogError("Add player start to scene."); return; }
             
             int Index = PlayerStarts.Count < World.Instance.PlayerArray.Count ? World.Instance.PlayerArray.Count : 0;

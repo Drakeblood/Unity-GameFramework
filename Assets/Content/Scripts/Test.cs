@@ -6,9 +6,14 @@ using GameFramework.AbilitySystem;
 
 public class Test : MonoBehaviour
 {
-    [GameplayTag] public GameplayTag Tag1;
-    [GameplayTag] public GameplayTag Tag2;
-    [GameplayTag] public GameplayTag[] Tags;
+    [GameplayTag] 
+    public GameplayTag Tag1;
+
+    [GameplayTag]
+    public GameplayTag Tag2;
+
+    [GameplayTag] 
+    public GameplayTag[] Tags;
 
     ListenerHandle MessageHandle;
 
@@ -19,15 +24,17 @@ public class Test : MonoBehaviour
         if (Tag1 != null)
         {
             GetComponent<Renderer>().material.color = Color.green;
-            //Debug.Log(Tag1 == Tag2);
+            Debug.Log(Tag1 == Tag2);
         }
         else
         {
             GetComponent<Renderer>().material.color = Color.red;
         }
 
-        MessageData Messagee = new MessageData();
-        Messagee.Name = "Test Message";
+        MessageData Messagee = new()
+        {
+            Name = "Test Message"
+        };
 
         MessageRouter.BroadcastMessage("Test", Messagee);
         MessageRouter.UnregisterListener(MessageHandle);
@@ -51,9 +58,9 @@ public class Test : MonoBehaviour
         //ASC.UpdateTags(Tag1, -1);
         //ASC.UpdateTags(Tag2, 1);
 
-        foreach (var Tag in Tags)
+        for (int i = 0; i < Tags.Length; i++)
         {
-            ASC.UpdateTags(Tag, 1);
+            ASC.UpdateTags(Tags[i], 1);
         }
     }
 

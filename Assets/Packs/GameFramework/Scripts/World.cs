@@ -54,10 +54,7 @@ namespace GameFramework.System
                 return;
             }
 
-            if (GameInstance == null)
-            {
-                GameInstance = (GameInstance)Activator.CreateInstance(Settings.GameInstanceClass.Type);
-            }
+            GameInstance ??= (GameInstance)Activator.CreateInstance(Settings.GameInstanceClass.Type);
 
             InitGameMode(Settings.DefaultGameModeSettings);
         }

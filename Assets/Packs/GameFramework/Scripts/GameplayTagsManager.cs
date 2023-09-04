@@ -6,7 +6,7 @@ namespace GameFramework.System
 {
     public static class GameplayTagsManager
     {
-        private static string[] TagsNames;
+        private static readonly string[] TagsNames;
         public static string[] GetTagsNames() => TagsNames;
 
         private static GameplayTag[] Tags = new GameplayTag[0];
@@ -47,12 +47,12 @@ namespace GameFramework.System
 
             for (int i = 0; i < TagsNames.Length; i++)
             {
-                List<GameplayTag> ParentTags = new List<GameplayTag>();
+                List<GameplayTag> ParentTags = new();
                 {
                     string Tag = TagsNames[i];
                     for (int Index = Tag.LastIndexOf('.'); Index != -1; Index = Tag.LastIndexOf('.'))
                     {
-                        Tag = Tag.Substring(0, Index);
+                        Tag = Tag[..Index];
                         ParentTags.Add(GetTag(Tag));
                     }
                 }

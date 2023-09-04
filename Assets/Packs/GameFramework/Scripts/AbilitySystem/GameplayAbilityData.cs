@@ -13,10 +13,10 @@ namespace GameFramework.AbilitySystem
     public class GameplayAbilityData : ScriptableObject
     {
         [Inherits(typeof(GameplayAbility), IncludeBaseType = true, ShowNoneElement = false)]
-        public TypeReference AbilityClass = new TypeReference(typeof(GameplayAbility));
+        public TypeReference AbilityClass = new(typeof(GameplayAbility));
 
         [SerializeField, HideInInspector]
-        private TypeReference OldAbilityClass = new TypeReference(typeof(GameplayAbility));
+        private TypeReference OldAbilityClass = new(typeof(GameplayAbility));
 
         [SerializeReference]
         private GameplayAbility GameplayAbility;

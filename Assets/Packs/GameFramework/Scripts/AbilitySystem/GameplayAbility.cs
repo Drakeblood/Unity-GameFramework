@@ -12,6 +12,7 @@ namespace GameFramework.AbilitySystem
     {
         [SerializeField, HideInInspector]
         public GameplayAbilityData AbilityData;
+
         public AbilitySystemComponent OwningAbilitySystemComponent { get; private set; }
 
         private bool IsActive = false;
@@ -63,9 +64,9 @@ namespace GameFramework.AbilitySystem
 
             IsActive = true;
 
-            foreach (GameplayTag Tag in AbilityData.ActivationOwnedTags)
+            for (int i = 0; i < AbilityData.ActivationOwnedTags.Length; i++)
             {
-                OwningAbilitySystemComponent.UpdateTags(Tag, 1);
+                OwningAbilitySystemComponent.UpdateTags(AbilityData.ActivationOwnedTags[i], 1);
             }
         }
 
@@ -75,11 +76,10 @@ namespace GameFramework.AbilitySystem
 
             IsActive = false;
 
-            foreach (GameplayTag Tag in AbilityData.ActivationOwnedTags)
+            for (int i = 0; i < AbilityData.ActivationOwnedTags.Length; i++)
             {
-                OwningAbilitySystemComponent.UpdateTags(Tag, -1);
+                OwningAbilitySystemComponent.UpdateTags(AbilityData.ActivationOwnedTags[i], -1);
             }
-
             OnAbilityEnded?.Invoke(WasCanceled);
         }
     }

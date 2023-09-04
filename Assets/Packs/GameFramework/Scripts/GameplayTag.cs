@@ -49,11 +49,11 @@ namespace GameFramework.System
         {
             if (InTags2.Length < 1) return false;
 
-            foreach (var Tag2 in InTags2)
+            for (int i = 0; i < InTags2.Length; i++)
             {
-                foreach (var Tag1 in InTags1)
+                for (int j = 0; j < InTags1.Length; j++)
                 {
-                    if(Tag1.MatchesTag(Tag2)) return true;
+                    if (InTags1[j].MatchesTag(InTags2[i])) return true;
                 }
             }
             return false;
@@ -63,11 +63,11 @@ namespace GameFramework.System
         {
             if(InTags2.Length < 1) return true;
 
-            foreach (var Tag2 in InTags2)
+            for (int i = 0; i < InTags2.Length; i++)
             {
-                foreach (var Tag1 in InTags1)
+                for (int j = 0; j < InTags1.Length; j++)
                 {
-                    if (!Tag1.MatchesTag(Tag2)) return false;
+                    if (!InTags1[j].MatchesTag(InTags2[i])) return false;
                 }
             }
             return true;
@@ -84,7 +84,7 @@ namespace GameFramework.System
         public static bool Equals(GameplayTag X, GameplayTag Y)
         {
             if ((object)X == (object)Y) return true;
-            if ((object)X == null || (object)Y == null) return false;
+            if (X is null || Y is null) return false;
             return X.Equals(Y);
         }
 

@@ -12,12 +12,12 @@ namespace GameFramework.AbilitySystem
     public partial class AbilitySystemComponent : MonoBehaviour
     {
         [SerializeField] 
-        private List<GameplayAbilityData> StartupAbilities = new List<GameplayAbilityData>();
-        protected List<GameplayAbility> ActivatableAbilities = new List<GameplayAbility>();
+        private List<GameplayAbilityData> StartupAbilities = new();
+        protected List<GameplayAbility> ActivatableAbilities = new();
 
-        protected Dictionary<GameplayTag, int> GameplayTagCountArray = new Dictionary<GameplayTag, int>();
-        protected List<GameplayTag> ExplicitGameplayTags = new List<GameplayTag>();
-        protected Dictionary<GameplayTag, GameplayTagDelegate> GameplayTagEventArray = new Dictionary<GameplayTag, GameplayTagDelegate>();
+        protected Dictionary<GameplayTag, int> GameplayTagCountArray = new();
+        protected List<GameplayTag> ExplicitGameplayTags = new();
+        protected Dictionary<GameplayTag, GameplayTagDelegate> GameplayTagEventArray = new();
 
         public delegate void GameplayTagDelegate(GameplayTag Tag, int NewCount);
 
@@ -64,19 +64,19 @@ namespace GameFramework.AbilitySystem
         {
             if (AbilityClass == null) { Debug.LogError("AbilityClass is not valid"); return false; }
 
-            foreach (var Ability in ActivatableAbilities)
+            for (int i = 0; i < ActivatableAbilities.Count; i++)
             {
-                if(Ability.AbilityData == null)
+                if (ActivatableAbilities[i].AbilityData == null)
                 {
-                    Debug.LogError("AbilityData is not valid. " + Ability.ToString());
+                    Debug.LogError("AbilityData is not valid. " + ActivatableAbilities[i].ToString());
                     continue;
                 }
 
-                if (Ability.AbilityData.AbilityClass.Type == AbilityClass)
+                if (ActivatableAbilities[i].AbilityData.AbilityClass.Type == AbilityClass)
                 {
-                    if (!Ability.CanActivateAbility()) return false;
+                    if (!ActivatableAbilities[i].CanActivateAbility()) return false;
 
-                    Ability.ActivateAbility();
+                    ActivatableAbilities[i].ActivateAbility();
                     return true;
                 }
             }
@@ -129,13 +129,16 @@ namespace GameFramework.AbilitySystem
                 if (GameplayTagEventArray.ContainsKey(Tag))
                 {
                     List<GameplayTagDelegate> InvalidDelegates = null;
-                    foreach (GameplayTagDelegate TagDelegate in GameplayTagEventArray[Tag].GetInvocationList())
+                    Delegate[] Delegates = GameplayTagEventArray[Tag].GetInvocationList();
+                    for (int i = 0; i < Delegates.Length; i++)
                     {
-                        if (TagDelegate.Target is MonoBehaviour)
+                        if (Delegates[i] is not GameplayTagDelegate TagDelegate) continue;
+                        
+                        if (TagDelegate.Target is MonoBehaviour Behaviour)
                         {
-                            if ((MonoBehaviour)TagDelegate.Target == null)
+                            if (Behaviour == null)
                             {
-                                if (InvalidDelegates == null) InvalidDelegates = new List<GameplayTagDelegate>();
+                                InvalidDelegates ??= new List<GameplayTagDelegate>();
                                 InvalidDelegates.Add(TagDelegate);
                                 continue;
                             }
@@ -145,9 +148,10 @@ namespace GameFramework.AbilitySystem
                     }
 
                     if (InvalidDelegates == null) return;
-                    foreach (GameplayTagDelegate InvalidDelegate in InvalidDelegates)
+
+                    for (int i = 0; i < InvalidDelegates.Count; i++)
                     {
-                        GameplayTagEventArray[Tag] -= InvalidDelegate;
+                        GameplayTagEventArray[Tag] -= InvalidDelegates[i];
                     }
                 }
             }
