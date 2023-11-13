@@ -6,7 +6,7 @@ namespace GameFramework.System
 {
     public static class GameplayTagsManager
     {
-        private static readonly string[] TagsNames;
+        private static string[] TagsNames;
         public static string[] GetTagsNames() => TagsNames;
 
         private static GameplayTag[] Tags = new GameplayTag[0];
