@@ -1037,6 +1037,7 @@ GameObject:
   - component: {fileID: 5885216827943657505}
   - component: {fileID: 135756642000475821}
   - component: {fileID: 4416926081852918493}
+  - component: {fileID: 4504942952575265558}
   m_Layer: 8
   m_Name: HeroCharacter
   m_TagString: Player
@@ -1279,6 +1280,21 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &4504942952575265558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4416926081852918481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baa0d837505c3564aae6d7462af6447e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startupAbilities:
+  - {fileID: 11400000, guid: 8a019fd8ce0fe804ca023ba16ec4ff33, type: 2}
+  - {fileID: 11400000, guid: 026b2b34ad2e9d6468d48aa1640625fc, type: 2}
 --- !u!1 &4523139366846529165
 GameObject:
   m_ObjectHideFlags: 0

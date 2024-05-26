@@ -42,26 +42,27 @@ public class Test : MonoBehaviour
         MessageRouter.BroadcastMessage("Test", Messagee);
 
         var ASC = GetComponent<AbilitySystemComponent>();
-        //ASC.RegisterGameplayTagEvent(Tag1, (GameplayTag Tag, int Count) =>
-        //{
-        //    if (Tag.GetTagId() != -1)
-        //    { 
-        //        GetComponent<Renderer>().material.color = Color.blue;
-        //    }
-        //    else 
-        //    { 
-        //        GetComponent<Renderer>().material.color = Color.cyan; 
-        //    }
-        //    //Debug.Log(Tag.GetTagName() + " | " + Tag.GetTagId() + " | " + Count);
-        //});
-        //ASC.UpdateTags(Tag1, 1);
-        //ASC.UpdateTags(Tag1, -1);
-        //ASC.UpdateTags(Tag2, 1);
-
-        for (int i = 0; i < Tags.Length; i++)
+        ASC.RegisterGameplayTagEvent(Tag1, (GameplayTag Tag, int Count) =>
         {
-            ASC.UpdateTags(Tags[i], 1);
-        }
+            Debug.Log($"{Tag}: {Count} TagEvent");
+            if (Tag.GetTagId() != -1)
+            {
+                GetComponent<Renderer>().material.color = Color.blue;
+            }
+            else
+            {
+                GetComponent<Renderer>().material.color = Color.cyan;
+            }
+            //Debug.Log(Tag.GetTagName() + " | " + Tag.GetTagId() + " | " + Count);
+        });
+        ASC.UpdateTagMap(Tag1, 1);
+        ASC.UpdateTagMap(Tag1, -1);
+        ASC.UpdateTagMap(Tag2, 1);
+
+        //for (int i = 0; i < Tags.Length; i++)
+        //{
+        //    ASC.UpdateTagMap(Tags[i], 1);
+        //}
     }
 
     private void Update()

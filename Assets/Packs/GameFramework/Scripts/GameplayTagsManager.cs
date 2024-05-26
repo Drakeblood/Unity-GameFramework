@@ -6,20 +6,20 @@ namespace GameFramework.System
 {
     public static class GameplayTagsManager
     {
-        private static string[] TagsNames;
-        public static string[] GetTagsNames() => TagsNames;
+        private static string[] tagsNames;
+        public static string[] TagsNames => tagsNames;
 
-        private static GameplayTag[] Tags = new GameplayTag[0];
-        private static Tuple<GameplayTag, GameplayTag[]>[] TagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[0];
+        private static GameplayTag[] tags = new GameplayTag[0];
+        private static Tuple<GameplayTag, GameplayTag[]>[] tagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[0];
 
 #if UNITY_EDITOR
         static GameplayTagsManager()
         {
-            TagsNames = File.ReadAllLines("Assets/Resources/" + ProjectStatics.GameplayTagsAssetPath + ".txt");
+            tagsNames = File.ReadAllLines("Assets/Resources/" + ProjectStatics.GameplayTagsAssetPath + ".txt");
 
-            for (int i = 0; i < TagsNames.Length; i++)
+            for (int i = 0; i < tagsNames.Length; i++)
             {
-                TagsNames[i] = TagsNames[i].Split(',')[0];
+                tagsNames[i] = tagsNames[i].Split(',')[0];
             }
             InitializeTags();
         }
@@ -30,11 +30,11 @@ namespace GameFramework.System
             UnityEngine.TextAsset TagsAsset = UnityEngine.Resources.Load<UnityEngine.TextAsset>(ProjectStatics.GameplayTagsAssetPath);
             if (TagsAsset == null) return;
 
-            TagsNames = TagsAsset.text.Split('\n');
+            tagsNames = TagsAsset.text.Split('\n');
 
-            for (int i = 0; i < TagsNames.Length; i++)
+            for (int i = 0; i < tagsNames.Length; i++)
             {
-                TagsNames[i] = TagsNames[i].Split(',')[0];
+                tagsNames[i] = tagsNames[i].Split(',')[0];
             }
             InitializeTags();
         }
@@ -42,66 +42,66 @@ namespace GameFramework.System
 
         private static void InitializeTags()
         {
-            Tags = new GameplayTag[TagsNames.Length];
-            TagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[TagsNames.Length];
+            tags = new GameplayTag[tagsNames.Length];
+            tagsWithSubTags = new Tuple<GameplayTag, GameplayTag[]>[tagsNames.Length];
 
-            for (int i = 0; i < TagsNames.Length; i++)
+            for (int i = 0; i < tagsNames.Length; i++)
             {
-                List<GameplayTag> ParentTags = new();
+                List<GameplayTag> parentTags = new();
                 {
-                    string Tag = TagsNames[i];
-                    for (int Index = Tag.LastIndexOf('.'); Index != -1; Index = Tag.LastIndexOf('.'))
+                    string tag = tagsNames[i];
+                    for (int index = tag.LastIndexOf('.'); index != -1; index = tag.LastIndexOf('.'))
                     {
-                        Tag = Tag[..Index];
-                        ParentTags.Add(GetTag(Tag));
+                        tag = tag[..index];
+                        parentTags.Add(GetTag(tag));
                     }
                 }
 
-                GameplayTag[] ParentTagsArray = new GameplayTag[ParentTags.Count];
+                GameplayTag[] parentTagsArray = new GameplayTag[parentTags.Count];
                 {
                     int n = 0;
-                    for (int j = ParentTags.Count - 1; j >= 0; j--)
+                    for (int j = parentTags.Count - 1; j >= 0; j--)
                     {
-                        ParentTagsArray[n++] = ParentTags[j];
+                        parentTagsArray[n++] = parentTags[j];
                     }
                 }
 
-                Tags[i] = new GameplayTag(TagsNames[i], i);
-                TagsWithSubTags[i] = new Tuple<GameplayTag, GameplayTag[]>(Tags[i], ParentTagsArray);
+                tags[i] = new GameplayTag(tagsNames[i], i);
+                tagsWithSubTags[i] = new Tuple<GameplayTag, GameplayTag[]>(tags[i], parentTagsArray);
             }
         }
 
-        public static GameplayTag GetTag(string InTagName)
+        public static GameplayTag GetTag(string tagName)
         {
-            for (int i = 0; i < Tags.Length; i++)
+            for (int i = 0; i < tags.Length; i++)
             {
-                if (Tags[i].GetTagName() == InTagName)
+                if (tags[i].TagName == tagName)
                 {
-                    return Tags[i];
+                    return tags[i];
                 }
             }
             return null;
         }
 
-        public static GameplayTag GetTag(int InId)
+        public static GameplayTag GetTag(int id)
         {
-            if (Tags.Length > InId)
+            if (tags.Length > id)
             {
-                return Tags[InId];
+                return tags[id];
             }
             return null;
         }
 
-        public static GameplayTag[] GetTags() => Tags;
-        public static int GetTagsCount() => Tags.Length;
+        public static GameplayTag[] GetTags() => tags;
+        public static int GetTagsCount() => tags.Length;
 
-        public static GameplayTag[] GetSeparatedTag(GameplayTag InTag)
+        public static GameplayTag[] GetSeparatedTag(GameplayTag tag)
         {
-            for (int i = 0; i < TagsWithSubTags.Length; i++)
+            for (int i = 0; i < tagsWithSubTags.Length; i++)
             {
-                if (TagsWithSubTags[i].Item1.GetTagName() == InTag.GetTagName())
+                if (tagsWithSubTags[i].Item1.TagName == tag.TagName)
                 {
-                    return TagsWithSubTags[i].Item2;
+                    return tagsWithSubTags[i].Item2;
                 }
             }
             return new GameplayTag[0];

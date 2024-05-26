@@ -9,67 +9,67 @@ namespace GameFramework.System
 {
     public static class MessageRouter
     {
-        private static readonly Dictionary<string, MessageDelegate> Listeners = new();
-        public delegate void MessageDelegate(string InChannel, object Data);
+        private static readonly Dictionary<string, MessageDelegate> listeners = new();
+        public delegate void MessageDelegate(string channel, object data);
 
-        public static ListenerHandle RegisterListener(string InChannel, MessageDelegate InDelegate)
+        public static ListenerHandle RegisterListener(string channel, MessageDelegate @delegate)
         {
-            if (!Listeners.ContainsKey(InChannel))
+            if (!listeners.ContainsKey(channel))
             {
-                Listeners.Add(InChannel, InDelegate);
-                return new ListenerHandle(InChannel, InDelegate);
+                listeners.Add(channel, @delegate);
+                return new ListenerHandle(channel, @delegate);
             }
 
-            Listeners[InChannel] += InDelegate;
-            return new ListenerHandle(InChannel, InDelegate );
+            listeners[channel] += @delegate;
+            return new ListenerHandle(channel, @delegate );
         }
 
-        public static void UnregisterListener(ListenerHandle Handle)
+        public static void UnregisterListener(ListenerHandle handle)
         {
-            if (!Listeners.ContainsKey(Handle.Channel)) return;
-            Listeners[Handle.Channel] -= Handle.Delegate;
+            if (!listeners.ContainsKey(handle.Channel)) return;
+            listeners[handle.Channel] -= handle.Delegate;
         }
 
-        public static void BroadcastMessage(string InChannel, object Data)
+        public static void BroadcastMessage(string channel, object data)
         {
-            if (!Listeners.ContainsKey(InChannel)) return;
-            if (Listeners[InChannel] == null) return;
+            if (!listeners.ContainsKey(channel)) return;
+            if (listeners[channel] == null) return;
 
-            List<MessageDelegate> InvalidListenerHandles = null;
-            Delegate[] Delegates = Listeners[InChannel].GetInvocationList();
+            List<MessageDelegate> invalidListenerHandles = null;
+            Delegate[] delegates = listeners[channel].GetInvocationList();
 
-            for (int i = 0; i < Delegates.Length; i++)
+            for (int i = 0; i < delegates.Length; i++)
             {
-                if (Delegates[i] is not MessageDelegate Delegate) continue;
+                if (delegates[i] is not MessageDelegate @delegate) continue;
 
-                if (Delegate.Target is MonoBehaviour Behaviour)
+                if (@delegate.Target is MonoBehaviour behaviour)
                 {
-                    if (Behaviour == null)
+                    if (behaviour == null)
                     {
-                        InvalidListenerHandles ??= new List<MessageDelegate>();
-                        InvalidListenerHandles.Add(Delegate);
+                        invalidListenerHandles ??= new List<MessageDelegate>();
+                        invalidListenerHandles.Add(@delegate);
                         continue;
                     }
                 }
 
-                Delegate.Invoke(InChannel, Data);
+                @delegate.Invoke(channel, data);
             }
 
-            if (InvalidListenerHandles == null) return;
+            if (invalidListenerHandles == null) return;
 
-            for (int i = 0; i < InvalidListenerHandles.Count; i++)
+            for (int i = 0; i < invalidListenerHandles.Count; i++)
             {
-                Listeners[InChannel] -= InvalidListenerHandles[i];
+                listeners[channel] -= invalidListenerHandles[i];
             }
         }
     }
 
     public class ListenerHandle
     {
-        public ListenerHandle(string InChannel, MessageDelegate InDelegate)
+        public ListenerHandle(string channel, MessageDelegate @delegate)
         {
-            Channel = InChannel;
-            Delegate = InDelegate;
+            Channel = channel;
+            Delegate = @delegate;
         }
 
         public readonly string Channel;

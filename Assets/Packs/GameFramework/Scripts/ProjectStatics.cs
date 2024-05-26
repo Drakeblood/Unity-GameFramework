@@ -8,13 +8,13 @@ namespace GameFramework.System
         public static readonly string GameModeSettingsAssetPath = "GameFramework/GameModeSettings";
         public static readonly string GameplayTagsAssetPath = "GameFramework/GameplayTags";
         
-        public static GameObject GetPlayer(int Index = 0)
+        public static GameObject GetPlayer(int index = 0)
         {
             if (World.Instance != null)
             {
-                if (World.Instance.PlayerArray.Count > Index)
+                if (World.Instance.PlayerArray.Count > index)
                 {
-                    return World.Instance.PlayerArray[Index];
+                    return World.Instance.PlayerArray[index];
                 }
             }
             return null;

@@ -9,36 +9,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e011a979c8cc2444292152bf544c44bc, type: 3}
-  m_Name: GA_Test 1
+  m_Script: {fileID: 11500000, guid: 6d507a4962a5a334d9dfbf6784a5747d, type: 3}
+  m_Name: GA_2
   m_EditorClassIdentifier: 
   AbilityClass:
     GuidAssignmentFailed: 0
     GUID: 9e8c5811b1a6dc94688d4a261ca49271
     _typeNameAndAssembly: GA_Test1, Assembly-CSharp
     _suppressLogs: 0
-  OldAbilityClass:
+  oldAbilityClass:
     GuidAssignmentFailed: 0
     GUID: 9e8c5811b1a6dc94688d4a261ca49271
     _typeNameAndAssembly: GA_Test1, Assembly-CSharp
     _suppressLogs: 0
-  GameplayAbility:
-    rid: 7154951281770233857
+  gameplayAbility:
+    rid: 6856680462102560769
+  InputActionReference: {fileID: -1916377846673030204, guid: 4419d82f33d36e848b3ed5af4c8da37e,
+    type: 3}
   AbilityTags: []
-  CancelAbilitiesWithTag: []
+  CancelAbilitiesWithTag:
+  - TagName: Character.Status.Stunned
+    TagId: 8
   BlockAbilitiesWithTag: []
   ActivationOwnedTags: []
-  ActivationRequiredTags:
-  - TagName: Character.Movement.Walking
-    TagId: 3
-  ActivationBlockedTags:
-  - TagName: Character.Status.Death
-    TagId: 5
+  ActivationRequiredTags: []
+  ActivationBlockedTags: []
   references:
     version: 2
     RefIds:
-    - rid: 7154951281770233857
+    - rid: 6856680462102560769
       type: {class: GA_Test1, ns: , asm: Assembly-CSharp}
       data:
-        AbilityData: {fileID: 11400000}
-        Text: ABCDE
+        AbilityDefinition: {fileID: 11400000}
+        Text: a

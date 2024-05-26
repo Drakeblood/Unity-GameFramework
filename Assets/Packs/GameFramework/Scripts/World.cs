@@ -10,26 +10,30 @@ namespace GameFramework.System
     {
         public static World Instance { get; private set; }
 
-        private static GameInstance GameInstance;
-        public T GetGameInstance<T>() where T : GameMode => GameInstance as T;
+        private static GameInstance gameInstance;
+        public T GetGameInstance<T>() where T : GameMode => gameInstance as T;
 
         private partial void Awake();
 
         #region GameMode
 
-        [SerializeField] private GameModeSettings GameModeSettingsOverride;
+        [SerializeField] 
+        private GameModeSettings gameModeSettingsOverride;
 
-        private GameMode GameMode;
-        public T GetGameMode<T>() where T : GameMode => GameMode as T;
+        private GameMode gameMode;
+        public T GetGameMode<T>() where T : GameMode => gameMode as T;
 
-        private partial void InitGameMode(GameModeSettings GameModeSettings);
+        private partial void InitGameMode(GameModeSettings gameModeSettings);
 
         #endregion
 
         #region Player
 
-        [HideInInspector] public List<GameObject> PlayerArray;
-        [SerializeField] private List<GameObject> PlayerStarts;
+        [HideInInspector]
+        public List<GameObject> PlayerArray;
+
+        [SerializeField]
+        private List<GameObject> playerStarts;
 
         #endregion
     }
@@ -47,40 +51,40 @@ namespace GameFramework.System
                 Instance = this;
             }
 
-            ProjectSettings Settings = Resources.Load<ProjectSettings>(ProjectStatics.ProjectSettingsAssetPath);
-            if (Settings == null)
+            ProjectSettings settings = Resources.Load<ProjectSettings>(ProjectStatics.ProjectSettingsAssetPath);
+            if (settings == null)
             {
                 Debug.LogError($"Resources/{ProjectStatics.ProjectSettingsAssetPath} file is not valid, create proper asset using Tool/GameFramework/InitProject");
                 return;
             }
 
-            GameInstance ??= (GameInstance)Activator.CreateInstance(Settings.GameInstanceClass.Type);
+            gameInstance ??= (GameInstance)Activator.CreateInstance(settings.GameInstanceClass.Type);
 
-            InitGameMode(Settings.DefaultGameModeSettings);
+            InitGameMode(settings.DefaultGameModeSettings);
         }
 
         #region GameMode
 
-        private partial void InitGameMode(GameModeSettings GameModeSettings)
+        private partial void InitGameMode(GameModeSettings gameModeSettings)
         {
-            if (GameModeSettingsOverride == null)
+            if (gameModeSettingsOverride == null)
             {
-                if (GameModeSettings.GameModeClass.Type == null)
+                if (gameModeSettings.GameModeClass.Type == null)
                 {
                     Debug.LogError("DefaultGameModeClass is not valid");
                     return;
                 }
 
-                GameMode = gameObject.AddComponent(GameModeSettings.GameModeClass.Type) as GameMode;
+                gameMode = gameObject.AddComponent(gameModeSettings.GameModeClass.Type) as GameMode;
             }
             else
             {
-                GameModeSettings = GameModeSettingsOverride;
-                GameMode = gameObject.AddComponent(GameModeSettingsOverride.GameModeClass.Type) as GameMode;
+                gameModeSettings = gameModeSettingsOverride;
+                gameMode = gameObject.AddComponent(gameModeSettingsOverride.GameModeClass.Type) as GameMode;
             }
 
-            GameMode.InitGameMode(GameModeSettings);
-            GameMode.CreatePlayer(PlayerStarts);
+            gameMode.InitGameMode(gameModeSettings);
+            gameMode.CreatePlayer(playerStarts);
         }
 
         #endregion

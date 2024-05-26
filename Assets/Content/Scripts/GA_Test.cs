@@ -1,7 +1,8 @@
+using System.Collections;
+
 using UnityEngine;
 
 using GameFramework.AbilitySystem;
-using System.Collections;
 
 public class GA_Test : GameplayAbility
 {
@@ -24,6 +25,7 @@ public class GA_Test : GameplayAbility
 
     public override void EndAbility(bool WasCanceled)
     {
+        Debug.Log($"{this} WasCanceled: {WasCanceled}");
         base.EndAbility(WasCanceled);
     }
 

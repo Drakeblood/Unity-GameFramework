@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using UnityEngine;
+using static UnityEngine.InputSystem.InputAction;
 
 using SolidUtilities.UnityEngineInternals;
 
@@ -12,30 +13,39 @@ namespace GameFramework.AbilitySystem
     public partial class AbilitySystemComponent : MonoBehaviour
     {
         [SerializeField] 
-        private List<GameplayAbilityData> StartupAbilities = new();
+        private List<GameplayAbilityDefinition> startupAbilities = new();
         protected List<GameplayAbility> ActivatableAbilities = new();
 
-        protected Dictionary<GameplayTag, int> GameplayTagCountArray = new();
-        protected List<GameplayTag> ExplicitGameplayTags = new();
-        protected Dictionary<GameplayTag, GameplayTagDelegate> GameplayTagEventArray = new();
-
-        public delegate void GameplayTagDelegate(GameplayTag Tag, int NewCount);
+        protected GameplayTagCountContainer GameplayTagCountContainer = new();
+        protected GameplayTagCountContainer BlockedAbilityTags = new();
 
         private partial void Awake();
 
         #region Abilities
 
-        public partial void GiveAbility(GameplayAbilityData AbilityData);
-        public partial bool TryActivateAbility(Type AbilityClass);
+        public partial void GiveAbility(GameplayAbilityDefinition abilityDefinition, object sourceObject = null);
+        public partial void ClearAbility(GameplayAbilityDefinition abilityDefinition);
+
+        public partial bool TryActivateAbility(Type abilityClass);
+        public partial void CancelAbilitiesWithTags(GameplayTag[] tags);
 
         #endregion
 
         #region GameplayTags
 
-        public GameplayTag[] GetExplicitGameplayTags() => ExplicitGameplayTags.ToArray();
-        public partial void UpdateTags(GameplayTag Tag, int CountDelta);
-        public partial void RegisterGameplayTagEvent(GameplayTag InTag, GameplayTagDelegate InDelegate);
+        public GameplayTag[] GetExplicitGameplayTags() => GameplayTagCountContainer.ExplicitGameplayTags.ToArray();
+        public GameplayTag[] GetBlockedAbilityTags() => BlockedAbilityTags.ExplicitGameplayTags.ToArray();
+        public partial void UpdateTagMap(GameplayTag tag, int countDelta);
+        public partial void RegisterGameplayTagEvent(GameplayTag tag, GameplayTagDelegate tagDelegate);
+        public partial void UpdateBlockedAbilityTags(GameplayTag tag, int countDelta);
         
+        #endregion
+
+        #region Input
+
+        public partial void AbilityInputPressed(CallbackContext callbackContext);
+        public partial void AbilityInputReleased(CallbackContext callbackContext);
+
         #endregion
     }
 
@@ -43,36 +53,75 @@ namespace GameFramework.AbilitySystem
     {
         private partial void Awake()
         {
-            for (int i = 0; i < StartupAbilities.Count; i++)
+            for (int i = 0; i < startupAbilities.Count; i++)
             {
-                GiveAbility(StartupAbilities[i]);
+                GiveAbility(startupAbilities[i]);
             }
         }
 
         #region Abilities
 
-        public partial void GiveAbility(GameplayAbilityData AbilityData)
+        public partial void GiveAbility(GameplayAbilityDefinition abilityDefinition, object sourceObject)
         {
-            if (AbilityData == null) { Debug.LogError("AbilityData is not vaild"); return; }
+            if (abilityDefinition == null) { Debug.LogError("AbilityDefinition is not vaild"); return; }
 
-            GameplayAbility GameplayAbility = AbilityData.GetGameplayAbility().ShallowCopy();
-            ActivatableAbilities.Add(GameplayAbility);
-            GameplayAbility.OnGiveAbility(this);
+            GameplayAbility ability = abilityDefinition.GameplayAbility.ShallowCopy();
+            ActivatableAbilities.Add(ability);
+
+            if (ability.AbilityDefinition.InputActionReference != null)
+            {
+                ability.AbilityDefinition.InputActionReference.action.started += AbilityInputPressed;
+                ability.AbilityDefinition.InputActionReference.action.canceled += AbilityInputReleased;
+                ability.AbilityDefinition.InputActionReference.action.Enable();
+            }
+
+            ability.SetupAbility(this, sourceObject);
+            ability.OnGiveAbility();
         }
 
-        public partial bool TryActivateAbility(Type AbilityClass)
+        public partial void ClearAbility(GameplayAbilityDefinition abilityDefinition)
         {
-            if (AbilityClass == null) { Debug.LogError("AbilityClass is not valid"); return false; }
+            if (abilityDefinition == null) { Debug.LogError("AbilityDefinition is not vaild"); return; }
 
             for (int i = 0; i < ActivatableAbilities.Count; i++)
             {
-                if (ActivatableAbilities[i].AbilityData == null)
+                if (ActivatableAbilities[i].AbilityDefinition == abilityDefinition)
+                {
+                    if (ActivatableAbilities[i].IsActive)
+                    {
+                        ActivatableAbilities[i].OnAbilityEnded += (bool wasCanceled) =>
+                        {
+                            ClearAbility(abilityDefinition);
+                        };
+                        return;
+                    }
+
+                    if (ActivatableAbilities[i].AbilityDefinition.InputActionReference != null)
+                    {
+                        ActivatableAbilities[i].AbilityDefinition.InputActionReference.action.started -= AbilityInputPressed;
+                        ActivatableAbilities[i].AbilityDefinition.InputActionReference.action.canceled -= AbilityInputReleased;
+                        ActivatableAbilities[i].AbilityDefinition.InputActionReference.action.Disable();
+                    }
+
+                    ActivatableAbilities.RemoveAt(i);
+                    return;
+                }
+            }
+        }
+
+        public partial bool TryActivateAbility(Type abilityClass)
+        {
+            if (abilityClass == null) { Debug.LogError("AbilityClass is not valid"); return false; }
+
+            for (int i = 0; i < ActivatableAbilities.Count; i++)
+            {
+                if (ActivatableAbilities[i].AbilityDefinition == null)
                 {
                     Debug.LogError("AbilityData is not valid. " + ActivatableAbilities[i].ToString());
                     continue;
                 }
 
-                if (ActivatableAbilities[i].AbilityData.AbilityClass.Type == AbilityClass)
+                if (ActivatableAbilities[i].AbilityDefinition.AbilityClass.Type == abilityClass)
                 {
                     if (!ActivatableAbilities[i].CanActivateAbility()) return false;
 
@@ -83,75 +132,78 @@ namespace GameFramework.AbilitySystem
             return false;
         }
 
+        public partial void CancelAbilitiesWithTags(GameplayTag[] tags)
+        {
+            if (tags.Length == 0) return;
+
+            for (int i = 0; i < ActivatableAbilities.Count; i++)
+            {
+                if (!ActivatableAbilities[i].IsActive) continue;
+
+                if (GameplayTag.HasAny(ActivatableAbilities[i].AbilityDefinition.AbilityTags, tags))
+                {
+                    ActivatableAbilities[i].EndAbility(true);
+                }
+            }
+        }
+
         #endregion
 
         #region GameplayTags
 
-        public partial void RegisterGameplayTagEvent(GameplayTag InTag, GameplayTagDelegate InDelegate)
+        public partial void RegisterGameplayTagEvent(GameplayTag tag, GameplayTagDelegate tagDelegate)
         {
-            if(!GameplayTagEventArray.ContainsKey(InTag))
-            {
-                GameplayTagEventArray.Add(InTag, InDelegate);
-                return;
-            }
-
-            GameplayTagEventArray[InTag] += InDelegate;
+            GameplayTagCountContainer.RegisterGameplayTagEvent(tag, tagDelegate);
         }
 
-        public partial void UpdateTags(GameplayTag Tag, int CountDelta)
+        public partial void UpdateTagMap(GameplayTag tag, int countDelta)
         {
-            if (CountDelta != 0)
+            if (GameplayTagCountContainer.UpdateTagCount(tag, countDelta))
             {
-                if(GameplayTagCountArray.ContainsKey(Tag))
-                {
-                    GameplayTagCountArray[Tag] = Math.Max(GameplayTagCountArray[Tag] + CountDelta, 0);
-                }
-                else
-                {
-                    GameplayTagCountArray.Add(Tag, Math.Max(CountDelta, 0));
-                }
+                //OnTagUpdated
+            }
+        }
 
-                if(ExplicitGameplayTags.Contains(Tag))
+        public partial void UpdateBlockedAbilityTags(GameplayTag tag, int countDelta)
+        {
+            BlockedAbilityTags.UpdateTagCount(tag, countDelta);
+        }
+
+        #endregion
+
+        #region Input
+
+        public partial void AbilityInputPressed(CallbackContext callbackContext)
+        {
+            for (int i = 0; i < ActivatableAbilities.Count; i++)
+            {
+                if (ActivatableAbilities[i].AbilityDefinition.InputActionReference.action == callbackContext.action)
                 {
-                    if (GameplayTagCountArray[Tag] == 0)
+                    ActivatableAbilities[i].IsInputPressed = true;
+
+                    if (ActivatableAbilities[i].IsActive)
                     {
-                        ExplicitGameplayTags.Remove(Tag);
+                        ActivatableAbilities[i].InputPressed();
+                    }
+                    else
+                    {
+                        TryActivateAbility(ActivatableAbilities[i].GetType());
                     }
                 }
-                else
+            }
+        }
+
+        public partial void AbilityInputReleased(CallbackContext callbackContext)
+        {
+            for (int i = 0; i < ActivatableAbilities.Count; i++)
+            {
+                if (ActivatableAbilities[i].AbilityDefinition.InputActionReference.action == callbackContext.action)
                 {
-                    if (GameplayTagCountArray[Tag] != 0)
+                    ActivatableAbilities[i].IsInputPressed = false;
+
+                    if (ActivatableAbilities[i].IsActive)
                     {
-                        ExplicitGameplayTags.Add(Tag);
-                    }
-                }
-
-                if (GameplayTagEventArray.ContainsKey(Tag))
-                {
-                    List<GameplayTagDelegate> InvalidDelegates = null;
-                    Delegate[] Delegates = GameplayTagEventArray[Tag].GetInvocationList();
-                    for (int i = 0; i < Delegates.Length; i++)
-                    {
-                        if (Delegates[i] is not GameplayTagDelegate TagDelegate) continue;
-                        
-                        if (TagDelegate.Target is MonoBehaviour Behaviour)
-                        {
-                            if (Behaviour == null)
-                            {
-                                InvalidDelegates ??= new List<GameplayTagDelegate>();
-                                InvalidDelegates.Add(TagDelegate);
-                                continue;
-                            }
-                        }
-
-                        TagDelegate.Invoke(Tag, GameplayTagCountArray[Tag]);
-                    }
-
-                    if (InvalidDelegates == null) return;
-
-                    for (int i = 0; i < InvalidDelegates.Count; i++)
-                    {
-                        GameplayTagEventArray[Tag] -= InvalidDelegates[i];
+                        ActivatableAbilities[i].InputReleased();
                     }
                 }
             }

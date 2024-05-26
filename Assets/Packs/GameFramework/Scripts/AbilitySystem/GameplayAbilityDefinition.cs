@@ -6,30 +6,33 @@ using TypeReferences;
 
 using GameFramework.System;
 using GameFramework.System.Attributes;
+using UnityEngine.InputSystem;
 
 namespace GameFramework.AbilitySystem
 {
-    [CreateAssetMenu(menuName = "GameFramework/AbilitySystem/GameplayAbilityData")]
-    public class GameplayAbilityData : ScriptableObject
+    [CreateAssetMenu(menuName = "GameFramework/AbilitySystem/GameplayAbilityDefinition")]
+    public class GameplayAbilityDefinition : ScriptableObject
     {
         [Inherits(typeof(GameplayAbility), IncludeBaseType = true, ShowNoneElement = false)]
         public TypeReference AbilityClass = new(typeof(GameplayAbility));
 
         [SerializeField, HideInInspector]
-        private TypeReference OldAbilityClass = new(typeof(GameplayAbility));
+        private TypeReference oldAbilityClass = new(typeof(GameplayAbility));
 
         [SerializeReference]
-        private GameplayAbility GameplayAbility;
-        public GameplayAbility GetGameplayAbility() => GameplayAbility;
+        private GameplayAbility gameplayAbility;
+        public GameplayAbility GameplayAbility => gameplayAbility;
+
+        public InputActionReference InputActionReference;
 
         private void OnValidate()
         {
-            if(AbilityClass.Type != OldAbilityClass.Type)
+            if(AbilityClass.Type != oldAbilityClass.Type)
             {
-                GameplayAbility = (GameplayAbility)Activator.CreateInstance(AbilityClass);
-                GameplayAbility.AbilityData = this;
+                gameplayAbility = (GameplayAbility)Activator.CreateInstance(AbilityClass);
+                gameplayAbility.AbilityDefinition = this;
 
-                OldAbilityClass.Type = AbilityClass.Type;
+                oldAbilityClass.Type = AbilityClass.Type;
             }
         }
 

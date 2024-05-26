@@ -7,23 +7,23 @@ namespace GameFramework.System
 {
     public class GameMode : MonoBehaviour
     {
-        private GameModeSettings GameModeSettings = null;
+        private GameModeSettings gameModeSettings = null;
 
-        public virtual void InitGameMode(GameModeSettings InGameModeSettings)
+        public virtual void InitGameMode(GameModeSettings gameModeSettings)
         {
-            GameModeSettings = InGameModeSettings;
+            this.gameModeSettings = gameModeSettings;
         }
 
-        public virtual void CreatePlayer(List<GameObject> PlayerStarts)
+        public virtual void CreatePlayer(List<GameObject> playerStarts)
         {
             Assert.IsNotNull(World.Instance);
-            if (GameModeSettings.PlayerPrefab == null) { Debug.LogError("PlayerPrefab is not valid. Set it in GameModeSettings"); return; }
-            if (PlayerStarts.Count == 0) { Debug.LogError("Add player start to scene."); return; }
+            if (gameModeSettings.PlayerPrefab == null) { Debug.LogError("PlayerPrefab is not valid. Set it in GameModeSettings"); return; }
+            if (playerStarts.Count == 0) { Debug.LogError("Add player start to scene."); return; }
             
-            int Index = PlayerStarts.Count < World.Instance.PlayerArray.Count ? World.Instance.PlayerArray.Count : 0;
+            int Index = playerStarts.Count < World.Instance.PlayerArray.Count ? World.Instance.PlayerArray.Count : 0;
 
-            GameObject PlayerStart = PlayerStarts[Index];
-            GameObject NewPlayer = Instantiate(GameModeSettings.PlayerPrefab, PlayerStart.transform.position, PlayerStart.transform.rotation);
+            GameObject PlayerStart = playerStarts[Index];
+            GameObject NewPlayer = Instantiate(gameModeSettings.PlayerPrefab, PlayerStart.transform.position, PlayerStart.transform.rotation);
 
             World.Instance.PlayerArray.Add(NewPlayer);
         }

@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEngine;
 
 using GameFramework.System;
+using System.Collections.Generic;
 
 namespace GameFramework.AbilitySystem
 {
@@ -11,48 +12,78 @@ namespace GameFramework.AbilitySystem
     public partial class GameplayAbility : object
     {
         [SerializeField, HideInInspector]
-        public GameplayAbilityData AbilityData;
+        public GameplayAbilityDefinition AbilityDefinition;
 
-        public AbilitySystemComponent OwningAbilitySystemComponent { get; private set; }
+        public AbilitySystemComponent AbilitySystemComponent { get; private set; }
 
-        private bool IsActive = false;
+        public bool IsActive { get; private set; }
+        public bool IsInputPressed { get; set; }
+        public object SourceObject { get; private set; }
 
-        public delegate void AbilityEnded(bool WasCanceled);
+        private List<Coroutine> coroutines = new List<Coroutine>();
+
+        public delegate void AbilityEnded(bool wasCanceled);
         public event AbilityEnded OnAbilityEnded;
 
-        public partial void StartCoroutine(IEnumerator Routine);
+        public partial void StartCoroutine(IEnumerator routine);
+        public partial void SetupAbility(AbilitySystemComponent abilitySystemComponent, object sourceObject = null);
 
-        public virtual partial void OnGiveAbility(AbilitySystemComponent InAbilitySystemComponent);
+        public virtual void OnGiveAbility() { }
         public virtual partial bool CanActivateAbility();
         public virtual partial void ActivateAbility();
-        public virtual partial void EndAbility(bool WasCanceled);
+        public virtual partial void EndAbility(bool wasCanceled = false);
+
+        public virtual void InputPressed() { }
+        public virtual void InputReleased() { }
     }
 
     public partial class GameplayAbility : object
     {
-        public partial void StartCoroutine(IEnumerator Routine)
+        public partial void StartCoroutine(IEnumerator routine)
         {
-            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return; }
+            if (AbilitySystemComponent == null) { Debug.LogError("OwningAbilityManager is not valid"); return; }
 
-            OwningAbilitySystemComponent.StartCoroutine(Routine);
+            coroutines.Add(AbilitySystemComponent.StartCoroutine(routine));
         }
 
-        public virtual partial void OnGiveAbility(AbilitySystemComponent InAbilitySystemComponent)
+        public partial void SetupAbility(AbilitySystemComponent abilitySystemComponent, object sourceObject)
         {
-            OwningAbilitySystemComponent = InAbilitySystemComponent;
+            AbilitySystemComponent = abilitySystemComponent;
+            SourceObject = sourceObject;
         }
 
         public virtual partial bool CanActivateAbility()
         {
             if (IsActive) return false;
-            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return false; }
-
-            if (AbilityData.ActivationBlockedTags.Length > 0 || AbilityData.ActivationRequiredTags.Length > 0)
+            if (AbilityDefinition == null)
             {
-                GameplayTag[] AbilitySystemComponentTags = OwningAbilitySystemComponent.GetExplicitGameplayTags();
+                Debug.LogError("AbilityDefinition is not valid");
+                return false;
+            }
+            if (AbilitySystemComponent == null)
+            {
+                Debug.LogError("OwningAbilityManager is not valid");
+                return false;
+            }
 
-                if (GameplayTag.HasAny(AbilitySystemComponentTags, AbilityData.ActivationBlockedTags)) return false;
-                if (!GameplayTag.HasAll(AbilitySystemComponentTags, AbilityData.ActivationRequiredTags)) return false;
+            if (GameplayTag.HasAny(AbilitySystemComponent.GetBlockedAbilityTags(),
+                AbilityDefinition.AbilityTags))
+            {
+                return false;
+            }
+
+            if (AbilityDefinition.ActivationBlockedTags.Length > 0 || AbilityDefinition.ActivationRequiredTags.Length > 0)
+            {
+                GameplayTag[] AbilityManagerStates = AbilitySystemComponent.GetExplicitGameplayTags();
+
+                if (GameplayTag.HasAny(AbilityManagerStates, AbilityDefinition.ActivationBlockedTags))
+                {
+                    return false;
+                }
+                if (!GameplayTag.HasAll(AbilityManagerStates, AbilityDefinition.ActivationRequiredTags))
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -60,27 +91,45 @@ namespace GameFramework.AbilitySystem
 
         public virtual partial void ActivateAbility()
         {
-            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return; }
+            if (AbilitySystemComponent == null) { Debug.LogError("OwningAbilityManager is not valid"); return; }
+
+            for (int i = 0; i < AbilityDefinition.ActivationOwnedTags.Length; i++)
+            {
+                AbilitySystemComponent.UpdateTagMap(AbilityDefinition.ActivationOwnedTags[i], 1);
+            }
+
+            for (int i = 0; i < AbilityDefinition.BlockAbilitiesWithTag.Length; i++)
+            {
+                AbilitySystemComponent.UpdateBlockedAbilityTags(AbilityDefinition.BlockAbilitiesWithTag[i], 1);
+            }
+
+            AbilitySystemComponent.CancelAbilitiesWithTags(AbilityDefinition.CancelAbilitiesWithTag);
 
             IsActive = true;
-
-            for (int i = 0; i < AbilityData.ActivationOwnedTags.Length; i++)
-            {
-                OwningAbilitySystemComponent.UpdateTags(AbilityData.ActivationOwnedTags[i], 1);
-            }
         }
 
-        public virtual partial void EndAbility(bool WasCanceled)
+        public virtual partial void EndAbility(bool wasCanceled)
         {
-            if (OwningAbilitySystemComponent == null) { Debug.LogError("OwningAbilitySystemComponent is not valid"); return; }
+            if (AbilitySystemComponent == null) { Debug.LogError("OwningAbilityManager is not valid"); return; }
 
             IsActive = false;
 
-            for (int i = 0; i < AbilityData.ActivationOwnedTags.Length; i++)
+            for (int i = 0; i < AbilityDefinition.ActivationOwnedTags.Length; i++)
             {
-                OwningAbilitySystemComponent.UpdateTags(AbilityData.ActivationOwnedTags[i], -1);
+                AbilitySystemComponent.UpdateTagMap(AbilityDefinition.ActivationOwnedTags[i], -1);
             }
-            OnAbilityEnded?.Invoke(WasCanceled);
+
+            for (int i = 0; i < AbilityDefinition.BlockAbilitiesWithTag.Length; i++)
+            {
+                AbilitySystemComponent.UpdateBlockedAbilityTags(AbilityDefinition.BlockAbilitiesWithTag[i], -1);
+            }
+
+            for (int i = 0; i < coroutines.Count; i++)
+            {
+                AbilitySystemComponent.StopCoroutine(coroutines[i]);
+            }
+
+            OnAbilityEnded?.Invoke(wasCanceled);
         }
     }
 }
