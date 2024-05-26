@@ -27,8 +27,8 @@ MonoBehaviour:
   InputActionReference: {fileID: 1120369429361536294, guid: ca9f5fa95ffab41fb9a615ab714db018,
     type: 3}
   AbilityTags:
-  - TagName: Character.Status.Stunned
-    TagId: 8
+  - tagName: 
+    tagId: 0
   CancelAbilitiesWithTag: []
   BlockAbilitiesWithTag: []
   ActivationOwnedTags: []

@@ -10,58 +10,58 @@ namespace GameFramework.Editor.Attributes
     [CustomPropertyDrawer(typeof(MonoScriptAttribute), false)]
     public class MonoScriptPropertyDrawer : PropertyDrawer
     {
-        static Dictionary<string, MonoScript> ScriptCache;
+        static Dictionary<string, MonoScript> scriptCache;
         static MonoScriptPropertyDrawer()
         {
-            ScriptCache = new Dictionary<string, MonoScript>();
-            var Scripts = Resources.FindObjectsOfTypeAll<MonoScript>();
-            for (int i = 0; i < Scripts.Length; i++)
+            scriptCache = new Dictionary<string, MonoScript>();
+            var scripts = Resources.FindObjectsOfTypeAll<MonoScript>();
+            for (int i = 0; i < scripts.Length; i++)
             {
-                var Type = Scripts[i].GetClass();
-                if (Type != null && !ScriptCache.ContainsKey(Type.FullName))
+                var type = scripts[i].GetClass();
+                if (type != null && !scriptCache.ContainsKey(type.FullName))
                 {
-                    ScriptCache.Add(Type.FullName, Scripts[i]);
+                    scriptCache.Add(type.FullName, scripts[i]);
                 }
             }
         }
-        bool ViewString = false;
+        bool viewString = false;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             if (property.propertyType == SerializedPropertyType.String)
             {
-                Rect R = EditorGUI.PrefixLabel(position, label);
-                Rect LabelRect = position;
-                LabelRect.xMax = R.xMin;
-                position = R;
-                ViewString = GUI.Toggle(LabelRect, ViewString, "", "label");
-                if (ViewString)
+                Rect r = EditorGUI.PrefixLabel(position, label);
+                Rect labelRect = position;
+                labelRect.xMax = r.xMin;
+                position = r;
+                viewString = GUI.Toggle(labelRect, viewString, "", "label");
+                if (viewString)
                 {
                     property.stringValue = EditorGUI.TextField(position, property.stringValue);
                     return;
                 }
-                MonoScript Script = null;
+                MonoScript script = null;
                 string typeName = property.stringValue;
                 if (!string.IsNullOrEmpty(typeName))
                 {
-                    ScriptCache.TryGetValue(typeName, out Script);
-                    if (Script == null)
+                    scriptCache.TryGetValue(typeName, out script);
+                    if (script == null)
                         GUI.color = Color.red;
                 }
 
-                Script = (MonoScript)EditorGUI.ObjectField(position, Script, typeof(MonoScript), false);
+                script = (MonoScript)EditorGUI.ObjectField(position, script, typeof(MonoScript), false);
                 if (GUI.changed)
                 {
-                    if (Script != null)
+                    if (script != null)
                     {
-                        var Type = Script.GetClass();
+                        var Type = script.GetClass();
                         MonoScriptAttribute attr = (MonoScriptAttribute)attribute;
                         if (attr.Type != null && !attr.Type.IsAssignableFrom(Type))
                             Type = null;
                         if (Type != null)
                             property.stringValue = Type.FullName;
                         else
-                            Debug.LogWarning("The script file " + Script.name + " doesn't contain an assignable class");
+                            Debug.LogWarning("The script file " + script.name + " doesn't contain an assignable class");
                     }
                     else
                         property.stringValue = "";

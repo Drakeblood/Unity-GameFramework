@@ -16,7 +16,7 @@ public class GA_Test : GameplayAbility
 
         if (G1 != null)
         {
-            Renderer = Object.FindObjectOfType<Test>().GetComponent<Renderer>();
+            Renderer = Object.FindObjectOfType<MeshRenderer>().GetComponent<Renderer>();
             Renderer.material.color = Color.blue;
         }
 

@@ -11,19 +11,19 @@ namespace GameFramework.Editor.Attributes
     [CustomPropertyDrawer(typeof(GameplayTagAttribute))]
     public class GameplayTagDrawer : PropertyDrawer
     {
-        string[] StringList = null;
+        string[] stringList = null;
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (StringList != GameplayTagsManager.GetTagsNames()) StringList = GameplayTagsManager.GetTagsNames();
+            if (stringList != GameplayTagsManager.TagsNames) stringList = GameplayTagsManager.TagsNames;
 
-            if (StringList != null && StringList.Length != 0)
+            if (stringList != null && stringList.Length != 0)
             {
-                SerializedProperty SerializedProperty = property.FindPropertyRelative("TagName");
+                SerializedProperty serializedProperty = property.FindPropertyRelative("TagName");
 
-                int SelectedIndex = Mathf.Max(Array.IndexOf(StringList, SerializedProperty.stringValue), 0);
-                SelectedIndex = EditorGUI.Popup(position, property.name, SelectedIndex, StringList);
-                SerializedProperty.stringValue = StringList[SelectedIndex];
+                int selectedIndex = Mathf.Max(Array.IndexOf(stringList, serializedProperty.stringValue), 0);
+                selectedIndex = EditorGUI.Popup(position, property.name, selectedIndex, stringList);
+                serializedProperty.stringValue = stringList[selectedIndex];
             }
             else EditorGUI.PropertyField(position, property, label);
         }

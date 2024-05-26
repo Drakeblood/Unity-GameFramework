@@ -28,25 +28,25 @@ namespace GameFramework.Editor
                 return;
             }
 
-            string Path = "Assets/Resources/GameFramework";
-            CheckFolders(ref Path);
+            string path = "Assets/Resources/GameFramework";
+            CheckFolders(ref path);
 
-            string FileName = ProjectStatics.ProjectSettingsAssetPath.Substring(ProjectStatics.ProjectSettingsAssetPath.LastIndexOf('/'));
+            string fileName = ProjectStatics.ProjectSettingsAssetPath.Substring(ProjectStatics.ProjectSettingsAssetPath.LastIndexOf('/'));
 
-            var Asset = ScriptableObject.CreateInstance<ProjectSettings>();
-            AssetDatabase.CreateAsset(Asset, Path + $"/{FileName}.asset");
+            var asset = ScriptableObject.CreateInstance<ProjectSettings>();
+            AssetDatabase.CreateAsset(asset, path + $"/{fileName}.asset");
 
-            GameModeSettings DefaultGameModeSettings = Resources.Load<GameModeSettings>(ProjectStatics.GameModeSettingsAssetPath);
-            if (DefaultGameModeSettings != null)
+            GameModeSettings defaultGameModeSettings = Resources.Load<GameModeSettings>(ProjectStatics.GameModeSettingsAssetPath);
+            if (defaultGameModeSettings != null)
             {
-                Asset.DefaultGameModeSettings = DefaultGameModeSettings;
-                EditorUtility.SetDirty(Asset);
+                asset.DefaultGameModeSettings = defaultGameModeSettings;
+                EditorUtility.SetDirty(asset);
             }
             
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"{FileName} created at Resources/GameFramework");
+            Debug.Log($"{fileName} created at Resources/GameFramework");
         }
 
         private static void CreateGameModeSettingsAsset()
@@ -57,17 +57,17 @@ namespace GameFramework.Editor
                 return;
             }
 
-            string Path = "Assets/Resources/GameFramework";
-            CheckFolders(ref Path);
+            string path = "Assets/Resources/GameFramework";
+            CheckFolders(ref path);
 
-            string FileName = ProjectStatics.GameModeSettingsAssetPath.Substring(ProjectStatics.GameModeSettingsAssetPath.LastIndexOf('/'));
+            string fileName = ProjectStatics.GameModeSettingsAssetPath.Substring(ProjectStatics.GameModeSettingsAssetPath.LastIndexOf('/'));
 
-            var Asset = ScriptableObject.CreateInstance<GameModeSettings>();
-            AssetDatabase.CreateAsset(Asset, Path + $"/{FileName}.asset");
+            var asset = ScriptableObject.CreateInstance<GameModeSettings>();
+            AssetDatabase.CreateAsset(asset, path + $"/{fileName}.asset");
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
-            Debug.Log($"{FileName} created at Resources/GameFramework");
+            Debug.Log($"{fileName} created at Resources/GameFramework");
         }
 
         private static void CreateGameplayTagsAsset()
@@ -93,29 +93,29 @@ namespace GameFramework.Editor
                 return;
             }
 
-            GameObject WorldGameObject = new GameObject();
-            WorldGameObject.name = "World";
-            WorldGameObject.isStatic = true;
-            WorldGameObject.AddComponent<World>();
+            GameObject worldGameObject = new GameObject();
+            worldGameObject.name = "World";
+            worldGameObject.isStatic = true;
+            worldGameObject.AddComponent<World>();
 
-            string Path = "Assets/Packs/GameFramework/" + WorldGameObject.name + ".prefab";
+            string path = "Assets/Packs/GameFramework/" + worldGameObject.name + ".prefab";
 
-            PrefabUtility.SaveAsPrefabAsset(WorldGameObject, Path, out bool bSuccess);
+            PrefabUtility.SaveAsPrefabAsset(worldGameObject, path, out bool bSuccess);
             if (!bSuccess)
             {
                 Debug.LogError("Could not created World prefab");
             }
 
-            Debug.Log($"World prefab created at {Path}");
-            UnityEngine.Object.DestroyImmediate(WorldGameObject);
+            Debug.Log($"World prefab created at {path}");
+            UnityEngine.Object.DestroyImmediate(worldGameObject);
         }
 
-        private static void CheckFolders(ref string Path)
+        private static void CheckFolders(ref string path)
         {
             if (!AssetDatabase.IsValidFolder("Assets/Resources/GameFramework"))
             {
-                string Guid = AssetDatabase.CreateFolder("Assets/Resources", "GameFramework");
-                Path = AssetDatabase.GUIDToAssetPath(Guid);
+                string guid = AssetDatabase.CreateFolder("Assets/Resources", "GameFramework");
+                path = AssetDatabase.GUIDToAssetPath(guid);
             }
         }
 
@@ -126,25 +126,25 @@ namespace GameFramework.Editor
             EditorSceneManager.newSceneCreated += OnNewSceneCreated;
         }
 
-        private static void OnNewSceneCreated(Scene InScene, NewSceneSetup InSetup, NewSceneMode InMode)
+        private static void OnNewSceneCreated(Scene scene, NewSceneSetup setup, NewSceneMode mode)
         {
-            CheckScene(InScene, false);
+            CheckScene(scene, false);
         }
 
-        private static void OnSceneOpened(Scene InScene, OpenSceneMode InMode)
+        private static void OnSceneOpened(Scene scene, OpenSceneMode mode)
         {
-            CheckScene(InScene);
+            CheckScene(scene);
         }
 
-        private static void CheckScene(Scene InScene, bool bSaveScene = true)
+        private static void CheckScene(Scene scene, bool bSaveScene = true)
         {
-            var World = UnityEngine.Object.FindObjectOfType<World>();
-            if (World == null)
+            var world = UnityEngine.Object.FindObjectOfType<World>();
+            if (world == null)
             {
-                PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Packs/GameFramework/World.prefab"), InScene);
+                PrefabUtility.InstantiatePrefab(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Packs/GameFramework/World.prefab"), scene);
                 if(bSaveScene)
                 {
-                    EditorSceneManager.SaveScene(InScene);
+                    EditorSceneManager.SaveScene(scene);
                 }
             }
         }
